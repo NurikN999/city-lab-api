@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\ActionController;
+use App\Http\Controllers\Api\AiPlanController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\CompareController;
 use App\Http\Controllers\Api\ModelController;
 use App\Http\Controllers\Api\RouteController;
 use App\Http\Controllers\Api\ScenarioController;
@@ -14,3 +16,5 @@ Route::get('/model', ModelController::class);
 Route::get('/scenarios', [ScenarioController::class, 'index']);
 Route::post('/scenarios', [ScenarioController::class, 'store'])->middleware('throttle:60,1');
 Route::get('/scenarios/{scenario}', [ScenarioController::class, 'show']);
+Route::get('/compare', CompareController::class);
+Route::post('/ai/plan', AiPlanController::class)->middleware('throttle:10,1');

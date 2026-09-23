@@ -56,3 +56,15 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Реальная геометрия Актау
+
+1. Полигоны микрорайонов нарисовать в geojson.io, у каждого `properties.name` («12 мкр») и `properties.population`. Сохранить как `database/data/geodata/districts.geojson`.
+2. Маршруты — линии в geojson.io, **вершина = остановка**, `properties.key` (`a`/`b`/`c`) и `properties.name`. Сохранить как `routes.geojson`.
+3. Остановки из OpenStreetMap:
+
+```bash
+curl -s https://overpass-api.de/api/interpreter --data-urlencode 'data=[out:json][timeout:25];node["highway"="bus_stop"](43.60,51.08,43.73,51.28);out;' -o database/data/geodata/stops.json
+```
+
+4. `php artisan city:import-geodata database/data/geodata`

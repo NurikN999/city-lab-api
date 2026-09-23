@@ -16,11 +16,11 @@ Route::get('/actions', [ActionController::class, 'index']);
 Route::get('/routes', RouteController::class);
 Route::get('/model', ModelController::class);
 Route::get('/scenarios', [ScenarioController::class, 'index']);
-Route::post('/scenarios', [ScenarioController::class, 'store'])->middleware('throttle:60,1');
+Route::post('/scenarios', [ScenarioController::class, 'store'])->middleware('throttle:60,1,scenarios');
 Route::get('/scenarios/{scenario}', [ScenarioController::class, 'show']);
-Route::get('/compare', CompareController::class);
-Route::post('/ai/plan', AiPlanController::class)->middleware('throttle:10,1');
-Route::post('/login', LoginController::class)->middleware('throttle:5,1');
+Route::get('/compare', CompareController::class)->middleware('throttle:30,1,compare');
+Route::post('/ai/plan', AiPlanController::class)->middleware('throttle:10,1,ai');
+Route::post('/login', LoginController::class)->middleware('throttle:5,1,login');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('/actions/{action}', [ActionController::class, 'update']);

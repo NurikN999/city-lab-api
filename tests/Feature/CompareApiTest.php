@@ -43,6 +43,16 @@ class CompareApiTest extends TestCase
         $this->assertStringContainsString('стоимость', $response->json('explanation'));
     }
 
+    public function test_compare_is_rate_limited(): void
+    {
+        $a = $this->scenario('smart_lights');
+        for ($i = 0; $i < 30; $i++) {
+            $this->getJson("/api/compare?ids={$a}")->assertOk();
+        }
+
+        $this->getJson("/api/compare?ids={$a}")->assertStatus(429);
+    }
+
     public function test_compare_validates_ids(): void
     {
         $this->getJson('/api/compare?ids=1,2,3,4')->assertStatus(422);

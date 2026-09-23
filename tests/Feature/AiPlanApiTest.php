@@ -46,6 +46,18 @@ class AiPlanApiTest extends TestCase
             ->assertStatus(422)->assertJsonStructure(['message']);
     }
 
+    public function test_rate_limit_is_per_client_behind_proxy(): void
+    {
+        $proxy = ['REMOTE_ADDR' => '10.0.0.1'];
+        for ($i = 0; $i < 10; $i++) {
+            $this->withServerVariables($proxy)->withHeader('X-Forwarded-For', '1.1.1.1')
+                ->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(422);
+        }
+
+        $this->withServerVariables($proxy)->withHeader('X-Forwarded-For', '2.2.2.2')
+            ->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(422);
+    }
+
     public function test_long_generated_names_fit_varchar_255(): void
     {
         \App\Models\BusRoute::where('key', 'b')->update(['name' => 'Маршрут Б: '.str_repeat('Приморский бульвар — ', 8)]);

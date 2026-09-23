@@ -46,6 +46,17 @@ class AiPlanApiTest extends TestCase
             ->assertStatus(422)->assertJsonStructure(['message']);
     }
 
+    public function test_long_generated_names_fit_varchar_255(): void
+    {
+        \App\Models\BusRoute::where('key', 'b')->update(['name' => 'Маршрут Б: '.str_repeat('Приморский бульвар — ', 8)]);
+
+        $response = $this->postJson('/api/ai/plan', ['prompt' => 'пробки жара воздух вода школ автобус в 12 мкр бюджет 1 млрд'])->assertOk();
+
+        foreach ($response->json('scenarios') as $s) {
+            $this->assertLessThanOrEqual(255, mb_strlen($s['scenario']['name']));
+        }
+    }
+
     public function test_prompt_is_validated(): void
     {
         $this->postJson('/api/ai/plan', ['prompt' => ''])->assertStatus(422)->assertJsonValidationErrors('prompt');

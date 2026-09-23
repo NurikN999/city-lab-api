@@ -13,6 +13,8 @@ use App\Simulation\Data\PlannedItem;
 use App\Simulation\Goal;
 use App\Simulation\ScenarioOptimizer;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AiPlanController extends Controller
 {
@@ -41,16 +43,18 @@ class AiPlanController extends Controller
 
         $out = [];
         $labeled = [];
-        foreach ($optimized->scenarios as $i => $candidate) {
-            $label = self::LABELS[$i];
-            $name = implode(' + ', array_map(
-                fn (PlannedItem $it) => $it->route !== null ? $it->route->name : $it->action->name,
-                $candidate->items,
-            ));
-            $scenario = $repo->create("{$label} · {$name}", 'ai', $intent->budget, $intent->districtId, $candidate->items);
-            $labeled[$label] = ['name' => $name, 'result' => $candidate->result];
-            $out[] = ['label' => $label, 'scenario' => new ScenarioResource($scenario), 'result' => $candidate->result->toArray()];
-        }
+        DB::transaction(function () use ($optimized, $repo, $intent, &$out, &$labeled) {
+            foreach ($optimized->scenarios as $i => $candidate) {
+                $label = self::LABELS[$i];
+                $name = implode(' + ', array_map(
+                    fn (PlannedItem $it) => $it->route !== null ? $it->route->name : $it->action->name,
+                    $candidate->items,
+                ));
+                $scenario = $repo->create(Str::limit("{$label} · {$name}", 240, '…'), 'ai', $intent->budget, $intent->districtId, $candidate->items);
+                $labeled[$label] = ['name' => $name, 'result' => $candidate->result];
+                $out[] = ['label' => $label, 'scenario' => new ScenarioResource($scenario), 'result' => $candidate->result->toArray()];
+            }
+        });
 
         return response()->json([
             'intent' => [

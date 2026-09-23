@@ -9,7 +9,7 @@ use App\Simulation\Data\PlannedItem;
 
 final class SimulationService
 {
-    /** @var array<string, float> per-request memo: district object + stop set → coverage */
+    /** @var array<string, float> per-request memo: city object + district + stop-set key → coverage */
     private array $coverageCache = [];
 
     /** @var array<string, list<int>> */
@@ -51,7 +51,7 @@ final class SimulationService
         foreach ($city->districts as $id => $district) {
             $out[$id] = $district->values;
             if (isset($city->metrics['transit_coverage'])) {
-                $out[$id]['transit_coverage'] = $this->coverage($district, $city->stops);
+                $out[$id]['transit_coverage'] = $this->coverage($city, $district, $city->stops, 'base');
             }
         }
 
@@ -62,9 +62,11 @@ final class SimulationService
     private function applyRouteCoverage(CityState $city, array $items, array &$after): void
     {
         $routeStops = [];
+        $routeIds = [];
         foreach ($items as $item) {
             if ($item->route !== null) {
                 array_push($routeStops, ...$item->route->stops);
+                $routeIds[] = $item->route->id;
             }
         }
         if ($routeStops === [] || ! isset($city->metrics['transit_coverage'])) {
@@ -72,8 +74,10 @@ final class SimulationService
         }
 
         $stops = array_merge($city->stops, $routeStops);
+        sort($routeIds);
+        $setKey = 'routes:'.implode(',', $routeIds);
         foreach ($city->districts as $id => $district) {
-            $after[$id]['transit_coverage'] = $this->coverage($district, $stops);
+            $after[$id]['transit_coverage'] = $this->coverage($city, $district, $stops, $setKey);
         }
     }
 
@@ -207,10 +211,13 @@ final class SimulationService
         return $this->neighborCache[$cacheKey] = $ids;
     }
 
-    /** @param list<array{0: float, 1: float}> $stops */
-    private function coverage(DistrictState $district, array $stops): float
+    /**
+     * @param  list<array{0: float, 1: float}>  $stops
+     * @param  string  $setKey  identifies the stop set cheaply ('base' or sorted route ids) — never hash the stops themselves
+     */
+    private function coverage(CityState $city, DistrictState $district, array $stops, string $setKey): float
     {
-        $key = spl_object_id($district).':'.md5(serialize($stops));
+        $key = spl_object_id($city).':'.$district->id.':'.$setKey;
 
         return $this->coverageCache[$key] ??= (new CoverageCalculator(
             $this->config['stop_access_radius_m'],

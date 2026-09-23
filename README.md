@@ -68,3 +68,13 @@ curl -s https://overpass-api.de/api/interpreter --data-urlencode 'data=[out:json
 ```
 
 4. `php artisan city:import-geodata database/data/geodata`
+
+## Деплой (Railway)
+
+1. New Project → Deploy from GitHub → `city-lab-api`; добавить PostgreSQL.
+2. Variables: `APP_KEY` (`php artisan key:generate --show`), `APP_ENV=production`, `APP_DEBUG=false`,
+   `DB_CONNECTION=pgsql`, `DB_URL=${{Postgres.DATABASE_URL}}`, `FRONTEND_URL=https://<vercel-домен>`,
+   `OPENAI_API_KEY`, `OPENAI_MODEL`, `ADMIN_PASSWORD`, `CACHE_STORE=database`.
+3. Pre-deploy command: `php artisan migrate --force`.
+4. Один раз после первого деплоя (Railway → service → Shell): `php artisan db:seed --force`.
+5. Проверка: `curl https://<railway-домен>/api/city`.

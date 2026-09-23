@@ -1,0 +1,61 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: city-lab-nginx
+    working_dir: /var/www/city-lab
+    volumes:
+      - ./:/var/www/city-lab
+      - ./docker/nginx/city-lab-local.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php
+      - postgres
+    depends_on:
+      - php
+      - postgres
+    ports:
+      - 8091:80
+
+  redis:
+    container_name: city-lab-redis
+    build: ./docker/redis
+    volumes:
+      - redis_city_lab:/data
+    ports:
+      - "6391:6379"
+
+  php:
+    container_name: city-lab-php
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/city-lab
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/z-php.ini
+    working_dir: /var/www/city-lab
+    depends_on:
+      - redis
+      - postgres
+    links:
+      - redis
+      - postgres
+    ports:
+      - 9096:9000
+
+  postgres:
+    container_name: city-lab-postgres
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: city_lab_db
+      POSTGRES_USER: city_lab_user
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_city_lab:/data/postgres
+    ports:
+      - 5491:5432
+
+volumes:
+  postgres_city_lab:
+    driver: local
+  redis_city_lab:
+    driver: local

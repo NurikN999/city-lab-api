@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Geodata\DemoMetrics;
 use App\Models\Action;
 use App\Models\BusRoute;
 use App\Models\District;
@@ -103,16 +104,9 @@ class DemoCitySeeder extends Seeder
                 'boundary' => ['type' => 'Polygon', 'coordinates' => [$this->ring($gx, $gy)]],
             ]);
             $row = (int) round($gy / 2.2);
-            $district->metrics()->attach([
-                $metrics['traffic'] => ['value' => $traffic],
-                $metrics['travel_time'] => ['value' => 100],
-                $metrics['co2'] => ['value' => 100],
-                $metrics['heat'] => ['value' => round(55 + 0.25 * $traffic)],
-                $metrics['air'] => ['value' => round(92 - 0.4 * $traffic)],
-                $metrics['water_loss'] => ['value' => 24 + ($i % 4) * 3],
-                $metrics['social_access'] => ['value' => 72 - $row * 6],
-                $metrics['satisfaction'] => ['value' => round(95 - 0.55 * $traffic)],
-            ]);
+            $district->metrics()->attach(collect(DemoMetrics::values($traffic, $i, $row))
+                ->mapWithKeys(fn ($value, $key) => [$metrics[$key] => ['value' => $value]])
+                ->all());
             $districtIds[$name] = $district->id;
         }
 

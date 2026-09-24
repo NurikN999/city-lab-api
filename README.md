@@ -59,12 +59,12 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Реальная геометрия Актау
 
-1. Полигоны микрорайонов нарисовать в geojson.io, у каждого `properties.name` («12 мкр») и `properties.population`. Сохранить как `database/data/geodata/districts.geojson`.
+1. Полигоны микрорайонов: `districts.geojson` собран из OSM (`place=neighbourhood|quarter|city_block`, 57 нумерованных мкр, имена вида «12 мкр»). `properties.population` в OSM нет — дописать вручную.
 2. Маршруты — линии в geojson.io, **вершина = остановка**, `properties.key` (`a`/`b`/`c`) и `properties.name`. Сохранить как `routes.geojson`.
 3. Остановки из OpenStreetMap:
 
 ```bash
-curl -s https://overpass-api.de/api/interpreter --data-urlencode 'data=[out:json][timeout:25];node["highway"="bus_stop"](43.60,51.08,43.73,51.28);out;' -o database/data/geodata/stops.json
+curl -sf -A 'city-lab-api/1.0' https://overpass-api.de/api/interpreter --data-urlencode 'data=[out:json][timeout:25];node["highway"="bus_stop"](43.60,51.08,43.73,51.28);out;' -o database/data/geodata/stops.json
 ```
 
 4. `php artisan city:import-geodata database/data/geodata`
@@ -78,3 +78,122 @@ curl -s https://overpass-api.de/api/interpreter --data-urlencode 'data=[out:json
 3. Pre-deploy command: `php artisan migrate --force`.
 4. Один раз после первого деплоя (Railway → service → Shell): `php artisan db:seed --force`.
 5. Проверка: `curl https://<railway-домен>/api/city`.
+
+## Деплой на сервер (Ubuntu + Docker)
+
+Для Ubuntu 22.04 / 24.04. Все контейнеры слушают только `127.0.0.1`, наружу проект отдаёт nginx хоста с HTTPS.
+
+### 1. Docker и файрвол
+
+```bash
+sudo apt update && sudo apt install -y git nginx certbot python3-certbot-nginx
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER   # перелогиниться после этого
+sudo ufw allow OpenSSH && sudo ufw allow 'Nginx Full' && sudo ufw enable
+```
+
+### 2. Код
+
+```bash
+sudo mkdir -p /opt/city-lab-api && sudo chown $USER: /opt/city-lab-api
+git clone <url-репозитория> /opt/city-lab-api
+cd /opt/city-lab-api
+```
+
+Если `database/data/geodata/` не закоммичена, скопировать её с локальной машины:
+`scp -r database/data/geodata user@server:/opt/city-lab-api/database/data/`.
+
+### 3. `.env`
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://api.example.kz
+
+DB_CONNECTION=pgsql
+DB_HOST=postgres
+DB_PORT=5432
+DB_DATABASE=city_lab_db
+DB_USERNAME=city_lab_user
+DB_PASSWORD=<длинный-случайный-пароль>   # openssl rand -hex 24
+
+CACHE_STORE=database
+SESSION_DRIVER=database
+QUEUE_CONNECTION=sync
+
+FRONTEND_URL=https://city-lab.example.kz   # точный origin фронта, без / на конце (CORS)
+ADMIN_PASSWORD=<пароль-акимата>
+OPENAI_API_KEY=...
+OPENAI_MODEL=...
+```
+
+`DB_*` читает и `docker-compose.yml`: Postgres создаётся с этими же логином и паролем. Менять `DB_PASSWORD` нужно **до** первого `up` — потом он уже записан в volume.
+
+Порт nginx-контейнера по умолчанию `8091`; если занят — `NGINX_PORT=8095` в `.env`.
+
+### 4. Первый запуск
+
+```bash
+docker compose up -d --build
+docker compose exec php composer install --no-dev --optimize-autoloader
+docker compose exec php php artisan key:generate --force
+sudo chown -R 33:33 storage bootstrap/cache   # 33 = www-data внутри контейнера
+
+A="docker compose exec -u www-data php php artisan"
+$A migrate --force
+$A db:seed --force                                    # только один раз!
+$A city:import-geodata database/data/geodata          # реальные районы/остановки/маршруты
+$A config:cache && $A route:cache
+curl -s http://127.0.0.1:8091/api/city | head -c 200  # должен вернуться JSON
+```
+
+### 5. Домен и HTTPS
+
+DNS: A-запись `api.example.kz` → IP сервера. Затем:
+
+```bash
+sudo tee /etc/nginx/sites-available/city-lab-api >/dev/null <<'EOF'
+server {
+    listen 80;
+    server_name api.example.kz;
+    client_max_body_size 50M;
+
+    location / {
+        proxy_pass http://127.0.0.1:8091;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+sudo ln -s /etc/nginx/sites-available/city-lab-api /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d api.example.kz   # сертификат + автопродление
+```
+
+Проверка: `curl https://api.example.kz/api/city`.
+
+### Обновление
+
+```bash
+cd /opt/city-lab-api && git pull
+docker compose up -d --build
+docker compose exec php composer install --no-dev --optimize-autoloader
+A="docker compose exec -u www-data php php artisan"
+$A migrate --force && $A config:cache && $A route:cache
+```
+
+Поменяли `.env` — повторить `$A config:cache`.
+
+### Обслуживание
+
+- Логи Laravel: `storage/logs/laravel.log`; контейнеров: `docker compose logs -f php nginx`.
+- Бэкап БД: `docker compose exec -T postgres pg_dump -U city_lab_user city_lab_db | gzip > backup-$(date +%F).sql.gz`.
+- Восстановление: `gunzip -c backup.sql.gz | docker compose exec -T postgres psql -U city_lab_user city_lab_db`.
+- После перезагрузки сервера контейнеры поднимаются сами (`restart: unless-stopped`).

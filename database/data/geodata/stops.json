@@ -1,0 +1,1070 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 2562593296,
+  "lat": 43.6351788,
+  "lon": 51.1859598,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4323077492,
+  "lat": 43.6555764,
+  "lon": 51.1511004,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4359206390,
+  "lat": 43.6883002,
+  "lon": 51.2089034,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Салтанат",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4359241690,
+  "lat": 43.6849622,
+  "lon": 51.2669010,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "#0"
+  }
+},
+{
+  "type": "node",
+  "id": 4359248389,
+  "lat": 43.6878094,
+  "lon": 51.2054333,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Асыл Ана",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4391590189,
+  "lat": 43.6353690,
+  "lon": 51.1996777,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4548657891,
+  "lat": 43.6693093,
+  "lon": 51.1626522,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4548665390,
+  "lat": 43.6726382,
+  "lon": 51.1594042,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4548679389,
+  "lat": 43.6726682,
+  "lon": 51.1596138,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4548679390,
+  "lat": 43.6694238,
+  "lon": 51.1626929,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4556700884,
+  "lat": 43.6315313,
+  "lon": 51.1626333,
+  "tags": {
+    "bench": "yes",
+    "bin": "yes",
+    "highway": "bus_stop",
+    "lit": "yes",
+    "name": "Парус",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556700885,
+  "lat": 43.6319399,
+  "lon": 51.1616829,
+  "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "highway": "bus_stop",
+    "lit": "no",
+    "name": "Парус",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556700887,
+  "lat": 43.6366707,
+  "lon": 51.1570420,
+  "tags": {
+    "bench": "yes",
+    "bin": "yes",
+    "highway": "bus_stop",
+    "lit": "yes",
+    "name": "Филармония",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556700888,
+  "lat": 43.6367425,
+  "lon": 51.1566611,
+  "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "highway": "bus_stop",
+    "lit": "yes",
+    "name": "Филармония",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703090,
+  "lat": 43.6409994,
+  "lon": 51.1545476,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Набережная"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703091,
+  "lat": 43.6424571,
+  "lon": 51.1535431,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Балбобек"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703097,
+  "lat": 43.6488427,
+  "lon": 51.1436665,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703098,
+  "lat": 43.6515598,
+  "lon": 51.1414094,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Астана"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703099,
+  "lat": 43.6523458,
+  "lon": 51.1401756,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Астана"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703100,
+  "lat": 43.6546726,
+  "lon": 51.1387661,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "68 дом"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703101,
+  "lat": 43.6555595,
+  "lon": 51.1377750,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "4 дом"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703102,
+  "lat": 43.6617419,
+  "lon": 51.1336726,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "15-й микрорайон, 35",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703103,
+  "lat": 43.6636279,
+  "lon": 51.1332005,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "15-й микрорайон, 38",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4556703104,
+  "lat": 43.6657040,
+  "lon": 51.1322725,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "52 дом"
+  }
+},
+{
+  "type": "node",
+  "id": 4556851690,
+  "lat": 43.6352012,
+  "lon": 51.1793989,
+  "tags": {
+    "bench": "yes",
+    "bin": "no",
+    "highway": "bus_stop",
+    "name": "Достык",
+    "name:en": "Druzhba",
+    "name:ru": "Дружба",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556851691,
+  "lat": 43.6350168,
+  "lon": 51.1788169,
+  "tags": {
+    "bench": "yes",
+    "bin": "yes",
+    "highway": "bus_stop",
+    "name": "Дружба",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4556851702,
+  "lat": 43.6355138,
+  "lon": 51.1743060,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Акку"
+  }
+},
+{
+  "type": "node",
+  "id": 4556851703,
+  "lat": 43.6352148,
+  "lon": 51.1700977,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Акбота"
+  }
+},
+{
+  "type": "node",
+  "id": 4556851704,
+  "lat": 43.6315846,
+  "lon": 51.1673350,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "4-й микрорайон д.4"
+  }
+},
+{
+  "type": "node",
+  "id": 4565144491,
+  "lat": 43.6778265,
+  "lon": 51.1600000,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Бекет",
+    "name:kk": "Бекет",
+    "operator": "Адам",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4568668596,
+  "lat": 43.6844910,
+  "lon": 51.2698680,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 4568676592,
+  "lat": 43.6903950,
+  "lon": 51.2208155,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Кука",
+    "name:kk": "Кука",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 5078037721,
+  "lat": 43.6518183,
+  "lon": 51.1527540,
+  "tags": {
+    "bench": "yes",
+    "highway": "bus_stop",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5078037722,
+  "lat": 43.6472082,
+  "lon": 51.1574287,
+  "tags": {
+    "bench": "yes",
+    "bin": "yes",
+    "highway": "bus_stop",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5153301521,
+  "lat": 43.6879088,
+  "lon": 51.1739344,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 5154129230,
+  "lat": 43.6872071,
+  "lon": 51.1741079,
+  "tags": {
+    "highway": "bus_stop"
+  }
+},
+{
+  "type": "node",
+  "id": 5598712622,
+  "lat": 43.6583711,
+  "lon": 51.1790895,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 7282967985,
+  "lat": 43.6047770,
+  "lon": 51.2257022,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "Юран",
+    "name:en": "Yuran"
+  }
+},
+{
+  "type": "node",
+  "id": 10584171924,
+  "lat": 43.6742284,
+  "lon": 51.1853642,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Сеним/29а микрорайон",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 11896767177,
+  "lat": 43.6470493,
+  "lon": 51.1574008,
+  "tags": {
+    "bench": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12167942851,
+  "lat": 43.6412156,
+  "lon": 51.1577277,
+  "tags": {
+    "bench": "yes",
+    "bin": "yes",
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform",
+    "shelter": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13397989292,
+  "lat": 43.6315674,
+  "lon": 51.1671878,
+  "tags": {
+    "highway": "bus_stop",
+    "name": "4-й микрорайон д.4"
+  }
+},
+{
+  "type": "node",
+  "id": 13939646316,
+  "lat": 43.6622667,
+  "lon": 51.1339541,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "15-й микрорайон, 35",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940158797,
+  "lat": 43.6184963,
+  "lon": 51.2297998,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Военная часть",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940158798,
+  "lat": 43.6186257,
+  "lon": 51.2300188,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Военная часть",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940158799,
+  "lat": 43.6176233,
+  "lon": 51.2263532,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Военная часть",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940158800,
+  "lat": 43.6174316,
+  "lon": 51.2270922,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Военная часть",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232437,
+  "lat": 43.6190628,
+  "lon": 51.2133327,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Приморский",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232438,
+  "lat": 43.6197727,
+  "lon": 51.2124531,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Приморский",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232448,
+  "lat": 43.6219302,
+  "lon": 51.2069830,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "ЖК Family Town",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232449,
+  "lat": 43.6223066,
+  "lon": 51.2065096,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "ЖК Family Town",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232453,
+  "lat": 43.6245086,
+  "lon": 51.1997323,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232454,
+  "lat": 43.6248603,
+  "lon": 51.1992513,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232459,
+  "lat": 43.6286719,
+  "lon": 51.1941572,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Пляж",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232460,
+  "lat": 43.6283173,
+  "lon": 51.1952174,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Пляж",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232503,
+  "lat": 43.6236306,
+  "lon": 51.2027632,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232520,
+  "lat": 43.6335819,
+  "lon": 51.1890386,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Поликлиника КНБ",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 13940232521,
+  "lat": 43.6335893,
+  "lon": 51.1892518,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Поликлиника КНБ",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224981,
+  "lat": 43.6515255,
+  "lon": 51.1655071,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224982,
+  "lat": 43.6538684,
+  "lon": 51.1709559,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224983,
+  "lat": 43.6583140,
+  "lon": 51.1798263,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224984,
+  "lat": 43.6622310,
+  "lon": 51.1865067,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224985,
+  "lat": 43.6664097,
+  "lon": 51.1930393,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224986,
+  "lat": 43.6663278,
+  "lon": 51.1924507,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224987,
+  "lat": 43.6619798,
+  "lon": 51.1856930,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224988,
+  "lat": 43.6541511,
+  "lon": 51.1709691,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224989,
+  "lat": 43.6519778,
+  "lon": 51.1654405,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224990,
+  "lat": 43.6797895,
+  "lon": 51.1943510,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224991,
+  "lat": 43.6791918,
+  "lon": 51.1944900,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224992,
+  "lat": 43.6846334,
+  "lon": 51.1956491,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224993,
+  "lat": 43.6865624,
+  "lon": 51.1993661,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224994,
+  "lat": 43.6864367,
+  "lon": 51.1996467,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224995,
+  "lat": 43.6874305,
+  "lon": 51.2044882,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224996,
+  "lat": 43.6876108,
+  "lon": 51.2061623,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224997,
+  "lat": 43.6884289,
+  "lon": 51.2108476,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224998,
+  "lat": 43.6891466,
+  "lon": 51.2148808,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026224999,
+  "lat": 43.6893307,
+  "lon": 51.2150320,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026225000,
+  "lat": 43.6901797,
+  "lon": 51.2206118,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247401,
+  "lat": 43.6903869,
+  "lon": 51.2315704,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247402,
+  "lat": 43.6901729,
+  "lon": 51.2320513,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247403,
+  "lat": 43.6890166,
+  "lon": 51.2385639,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247404,
+  "lat": 43.6891421,
+  "lon": 51.2386446,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247405,
+  "lat": 43.6884823,
+  "lon": 51.2415713,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247406,
+  "lat": 43.6884143,
+  "lon": 51.2434014,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247407,
+  "lat": 43.6876520,
+  "lon": 51.2481864,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247408,
+  "lat": 43.6874973,
+  "lon": 51.2512094,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247409,
+  "lat": 43.6870849,
+  "lon": 51.2528090,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247410,
+  "lat": 43.6867574,
+  "lon": 51.2570652,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247411,
+  "lat": 43.6864238,
+  "lon": 51.2579783,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247412,
+  "lat": 43.6858721,
+  "lon": 51.2624164,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247413,
+  "lat": 43.6855106,
+  "lon": 51.2631092,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247414,
+  "lat": 43.6842354,
+  "lon": 51.2703428,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247415,
+  "lat": 43.6836038,
+  "lon": 51.2770123,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 14026247416,
+  "lat": 43.6833064,
+  "lon": 51.2773742,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "public_transport": "platform"
+  }
+}
+
+  ]
+}

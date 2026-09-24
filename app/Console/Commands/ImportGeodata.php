@@ -20,8 +20,8 @@ class ImportGeodata extends Command
         $dir = rtrim($this->argument('dir'), '/');
         $files = ['districts.geojson', 'stops.json', 'routes.geojson'];
         foreach ($files as $file) {
-            if (! is_file("{$dir}/{$file}")) {
-                $this->error("Нет файла {$dir}/{$file}");
+            if (! is_file("{$dir}/{$file}") || ! json_validate(file_get_contents("{$dir}/{$file}"))) {
+                $this->error("Нет файла или невалидный JSON: {$dir}/{$file}");
 
                 return self::FAILURE;
             }
@@ -31,7 +31,8 @@ class ImportGeodata extends Command
             $files,
         );
 
-        DB::transaction(function () use ($districts, $stops, $routes) {
+        $imported = 0;
+        DB::transaction(function () use ($districts, $stops, $routes, &$imported) {
             foreach ($districts['features'] as $feature) {
                 $name = $feature['properties']['name'];
                 $ring = $feature['geometry']['coordinates'][0];
@@ -58,7 +59,12 @@ class ImportGeodata extends Command
 
             $allDistricts = District::all();
             $radius = config('simulation.stop_access_radius_m');
-            foreach ($routes['features'] as $feature) {
+            foreach ($routes['features'] as $i => $feature) {
+                if (($feature['geometry']['type'] ?? null) !== 'LineString' || ! isset($feature['properties']['key'], $feature['properties']['name'])) {
+                    $this->warn("Маршрут #{$i} пропущен: нужна линия с properties.key и properties.name.");
+
+                    continue;
+                }
                 $route = BusRoute::updateOrCreate(
                     ['key' => $feature['properties']['key']],
                     ['name' => $feature['properties']['name'], 'path' => $feature['geometry']],
@@ -75,11 +81,12 @@ class ImportGeodata extends Command
                     }
                 }
                 $route->districts()->sync(array_keys($served));
+                $imported++;
             }
         });
 
         $this->info(sprintf('Импортировано: районов %d, остановок %d, маршрутов %d.',
-            count($districts['features']), Stop::count(), count($routes['features'])));
+            count($districts['features']), Stop::count(), $imported));
 
         return self::SUCCESS;
     }

@@ -1,4 +1,4 @@
-DC=docker-compose
+DC=docker compose
 APP=$(DC) exec -u 1000 php
 DB=$(DC) exec postgres
 DBT=$(DC) exec -T postgres

@@ -5,22 +5,29 @@ namespace App\Console\Commands;
 use App\Geodata\DemoMetrics;
 use App\Models\District;
 use App\Models\Metric;
+use App\Simulation\Geo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class FillDemoMetrics extends Command
 {
-    protected $signature = 'city:fill-demo-metrics';
+    protected $signature = 'city:fill-demo-metrics {--population : Пересчитать население всех районов по площади}';
 
-    protected $description = 'Проставить демо-метрики районам, у которых нет значений (например, после city:import-geodata)';
+    protected $description = 'Проставить демо-метрики и оценку населения районам, у которых их нет (например, после city:import-geodata)';
 
     public function handle(): int
     {
         $metrics = Metric::all()->where('is_computed', false)->pluck('id', 'key');
         $filled = 0;
+        $populated = 0;
+        $density = config('simulation.demo_density_per_ha');
 
-        DB::transaction(function () use ($metrics, &$filled) {
+        DB::transaction(function () use ($metrics, $density, &$filled, &$populated) {
             foreach (District::with('metrics:id')->get() as $district) {
+                if ($district->population === 0 || $this->option('population')) {
+                    $district->update(['population' => (int) round(Geo::areaHa($district->boundary['coordinates'][0]) * $density, -2)]);
+                    $populated++;
+                }
                 $existing = $district->metrics->pluck('id')->all();
                 $missing = collect(DemoMetrics::forName($district->name))
                     ->filter(fn ($value, $key) => isset($metrics[$key]) && ! in_array($metrics[$key], $existing, true))
@@ -33,6 +40,7 @@ class FillDemoMetrics extends Command
         });
 
         $this->info("Демо-метрики проставлены: {$filled} ".$this->districtsWord($filled).'.');
+        $this->info("Население оценено: {$populated} (по площади, {$density} жит./га).");
 
         return self::SUCCESS;
     }

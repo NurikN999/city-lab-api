@@ -39,4 +39,12 @@ class GeoTest extends TestCase
         $this->assertGreaterThan(50, $count);
         $this->assertLessThan(100, $count);
     }
+
+    public function test_area_of_a_small_square_in_hectares(): void
+    {
+        // 0.01° × 0.01° у широты Актау ≈ 805 м × 1105 м ≈ 89 га
+        $ring = [[51.16, 43.65], [51.17, 43.65], [51.17, 43.66], [51.16, 43.66], [51.16, 43.65]];
+
+        $this->assertEqualsWithDelta(89.0, Geo::areaHa($ring), 1.0);
+    }
 }

@@ -31,6 +31,22 @@ final class Geo
         return $inside;
     }
 
+    /** Площадь кольца GeoJSON ([lng, lat]) в гектарах; равнопромежуточная проекция — точна для районов города. */
+    public static function areaHa(array $ring): float
+    {
+        $lat0 = deg2rad(array_sum(array_column($ring, 1)) / count($ring));
+        $x = fn (array $p) => deg2rad($p[0]) * self::EARTH_RADIUS_M * cos($lat0);
+        $y = fn (array $p) => deg2rad($p[1]) * self::EARTH_RADIUS_M;
+        $sum = 0.0;
+        for ($i = 0, $n = count($ring); $i < $n; $i++) {
+            $a = $ring[$i];
+            $b = $ring[($i + 1) % $n];
+            $sum += $x($a) * $y($b) - $x($b) * $y($a);
+        }
+
+        return abs($sum) / 2 / 10_000;
+    }
+
     /** @return list<array{0: float, 1: float}> [lat, lng] cell centers of an n×n bbox grid that fall inside the ring */
     public static function grid(array $ring, int $n): array
     {

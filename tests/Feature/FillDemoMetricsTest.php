@@ -35,4 +35,26 @@ class FillDemoMetricsTest extends TestCase
 
         $this->assertDatabaseCount('district_metric_values', 16 * 8);
     }
+
+    public function test_estimates_missing_population_from_area(): void
+    {
+        $this->seed(DemoCitySeeder::class);
+        config(['simulation.demo_density_per_ha' => 100]);
+        $square = ['type' => 'Polygon', 'coordinates' => [[[51.16, 43.65], [51.17, 43.65], [51.17, 43.66], [51.16, 43.66], [51.16, 43.65]]]];
+        $empty = District::create(['name' => '1А мкр', 'population' => 0, 'center_lat' => 43.655, 'center_lng' => 51.165, 'boundary' => $square]);
+
+        $this->artisan('city:fill-demo-metrics')->assertSuccessful()->expectsOutputToContain('Население оценено: 1');
+
+        $this->assertEqualsWithDelta(8900, $empty->fresh()->population, 100);
+        $this->assertSame(10000, District::where('name', '12 мкр')->value('population'));
+    }
+
+    public function test_population_flag_reestimates_every_district(): void
+    {
+        $this->seed(DemoCitySeeder::class);
+
+        $this->artisan('city:fill-demo-metrics --population')->assertSuccessful()->expectsOutputToContain('Население оценено: 16');
+
+        $this->assertNotSame(10000, District::where('name', '12 мкр')->value('population'));
+    }
 }

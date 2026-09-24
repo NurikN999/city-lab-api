@@ -34,6 +34,9 @@ final class Geo
     /** Площадь кольца GeoJSON ([lng, lat]) в гектарах; равнопромежуточная проекция — точна для районов города. */
     public static function areaHa(array $ring): float
     {
+        if (count($ring) < 3) {
+            return 0.0;
+        }
         $lat0 = deg2rad(array_sum(array_column($ring, 1)) / count($ring));
         $x = fn (array $p) => deg2rad($p[0]) * self::EARTH_RADIUS_M * cos($lat0);
         $y = fn (array $p) => deg2rad($p[1]) * self::EARTH_RADIUS_M;

@@ -193,6 +193,8 @@ A="docker compose exec -u www-data php php artisan"
 $A migrate --force && $A config:cache && $A route:cache
 ```
 
+Добавились районы после импорта — `$A city:fill-demo-metrics` (без `--population`: иначе затрутся правки населения, сделанные акиматом на странице «Модель»).
+
 Поменяли `.env` — повторить `$A config:cache`.
 
 ### Обслуживание

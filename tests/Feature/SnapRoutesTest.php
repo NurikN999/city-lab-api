@@ -42,4 +42,15 @@ class SnapRoutesTest extends TestCase
 
         $this->assertSame($before, BusRoute::where('key', 'b')->firstOrFail()->path);
     }
+
+    public function test_skips_a_route_with_a_single_stop(): void
+    {
+        Http::fake();
+        $route = BusRoute::where('key', 'c')->firstOrFail();
+        $route->stops()->where('position', '>', 0)->delete();
+
+        $this->artisan('city:snap-routes c')->assertSuccessful()->expectsOutputToContain('меньше двух остановок');
+
+        Http::assertNothingSent();
+    }
 }

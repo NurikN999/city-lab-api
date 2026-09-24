@@ -17,6 +17,11 @@ class SnapRoutes extends Command
     {
         foreach ($this->argument('keys') as $key) {
             $route = BusRoute::with('stops')->where('key', $key)->firstOrFail();
+            if ($route->stops->count() < 2) {
+                $this->warn("{$route->name}: меньше двух остановок — пропущен.");
+
+                continue;
+            }
             $routed = $osrm->route($route->stops->map(fn ($s) => [$s->lat, $s->lng])->all());
             if (! $routed['snapped']) {
                 $this->error("{$route->name}: OSRM недоступен, маршрут не изменён.");

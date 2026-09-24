@@ -19,8 +19,8 @@ final class KeywordIntentParser
     /** @param array<string, int> $districtIdsByNumber '12' | '12а' => id */
     public function parse(string $prompt, array $districtIdsByNumber, int $defaultBudget): ?Intent
     {
-        $text = mb_strtolower($prompt);
-        if (! preg_match('/(\d+)\s*((?!й)[а-яё])?\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)
+        $text = strtr(mb_strtolower($prompt), ['a' => 'а', 'b' => 'б', 'v' => 'в']); // «12a мкр» латиницей
+        if (! preg_match('/(\d+)\s*-?\s*((?!й)[а-яё])?\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)
             || ! isset($districtIdsByNumber[$district[1].($district[2] ?? '')])) {
             return null;
         }

@@ -85,4 +85,14 @@ class OsrmClientTest extends TestCase
         $this->assertFalse($routed['snapped']);
         Http::assertSentCount(1);
     }
+
+    public function test_no_route_answer_does_not_switch_routing_off(): void
+    {
+        Http::fake(['router.project-osrm.org/*' => Http::response(['code' => 'NoRoute'])]);
+
+        app(OsrmClient::class)->route(self::POINTS);
+        app(OsrmClient::class)->route([[43.661, 51.161], [43.668, 51.168]]);
+
+        Http::assertSentCount(2);
+    }
 }

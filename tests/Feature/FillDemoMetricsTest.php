@@ -57,4 +57,14 @@ class FillDemoMetricsTest extends TestCase
 
         $this->assertNotSame(10000, District::where('name', '12 мкр')->value('population'));
     }
+
+    public function test_missing_density_setting_falls_back_to_default(): void
+    {
+        $this->seed(DemoCitySeeder::class);
+        config(['simulation.demo_density_per_ha' => null]); // устаревший config:cache без нового ключа
+
+        $this->artisan('city:fill-demo-metrics --population')->assertSuccessful();
+
+        $this->assertGreaterThan(0, District::where('name', '12 мкр')->value('population'));
+    }
 }

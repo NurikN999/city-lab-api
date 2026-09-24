@@ -20,7 +20,7 @@ class FillDemoMetrics extends Command
         $metrics = Metric::all()->where('is_computed', false)->pluck('id', 'key');
         $filled = 0;
         $populated = 0;
-        $density = config('simulation.demo_density_per_ha');
+        $density = config('simulation.demo_density_per_ha') ?? 120; // устаревший config:cache не должен обнулить население
 
         DB::transaction(function () use ($metrics, $density, &$filled, &$populated) {
             foreach (District::with('metrics:id')->get() as $district) {

@@ -4,7 +4,7 @@ namespace App\Geodata;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use RuntimeException;
+use UnexpectedValueException;
 use Throwable;
 
 final class OsrmClient
@@ -29,7 +29,7 @@ final class OsrmClient
                     ->get("{$this->baseUrl}/route/v1/driving/{$coords}", ['overview' => 'full', 'geometries' => 'geojson'])
                     ->throw()->json();
                 if (($data['code'] ?? null) !== 'Ok') {
-                    throw new RuntimeException('OSRM: '.($data['code'] ?? 'no code'));
+                    throw new UnexpectedValueException('OSRM: '.($data['code'] ?? 'no code'));
                 }
 
                 return [
@@ -38,6 +38,8 @@ final class OsrmClient
                     'snapped' => true,
                 ];
             });
+        } catch (UnexpectedValueException) {
+            return $straight; // OSRM работает, но не нашёл путь между точками — роутинг не выключаем
         } catch (Throwable $e) {
             report($e);
             Cache::put('osrm:down', true, 60); // ponytail: не ждём таймаут на каждом клике, пока OSRM лежит

@@ -47,4 +47,10 @@ class GeoTest extends TestCase
 
         $this->assertEqualsWithDelta(89.0, Geo::areaHa($ring), 1.0);
     }
+
+    public function test_area_of_a_degenerate_ring_is_zero(): void
+    {
+        $this->assertSame(0.0, Geo::areaHa([]));
+        $this->assertSame(0.0, Geo::areaHa([[51.16, 43.65], [51.17, 43.65]]));
+    }
 }

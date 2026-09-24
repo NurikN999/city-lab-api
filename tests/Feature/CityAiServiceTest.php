@@ -130,4 +130,14 @@ class CityAiServiceTest extends TestCase
         $this->assertSame(105, $plain->districtId);
         $this->assertSame(106, $lettered->districtId);
     }
+
+    public function test_fallback_accepts_latin_letters_and_hyphen(): void
+    {
+        config(['services.openai.key' => null]);
+        $districts = ['12 мкр' => 105, '12А мкр' => 106];
+
+        foreach (['Пробки в 12a мкр', 'Пробки в 12-а мкр'] as $prompt) {
+            $this->assertSame(106, app(CityAiService::class)->parse($prompt, $districts, self::METRICS, 100_000_000)?->districtId, $prompt);
+        }
+    }
 }

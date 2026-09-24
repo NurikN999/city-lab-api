@@ -41,4 +41,9 @@ return [
         'timeout' => (int) env('OPENAI_TIMEOUT', 8),
     ],
 
+    'osrm' => [
+        'url' => env('OSRM_URL', 'https://router.project-osrm.org'),
+        'timeout' => (int) env('OSRM_TIMEOUT', 5),
+    ],
+
 ];

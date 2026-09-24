@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\CityAi\OpenAiClient;
+use App\Geodata\OsrmClient;
 use App\Simulation\SimulationService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
             config('services.openai.key'),
             config('services.openai.model'),
             (int) config('services.openai.timeout', 8),
+        ));
+        $this->app->bind(OsrmClient::class, fn () => new OsrmClient(
+            config('services.osrm.url'),
+            (int) config('services.osrm.timeout', 5),
         ));
     }
 

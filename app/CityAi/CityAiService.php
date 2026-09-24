@@ -37,8 +37,8 @@ final class CityAiService
 
         $byNumber = [];
         foreach ($districtIdsByName as $name => $id) {
-            if (preg_match('/^(\d+)/u', $name, $m)) {
-                $byNumber[$m[1]] = $id;
+            if (preg_match('/^(\d+[а-яё]?)/iu', $name, $m)) {
+                $byNumber[mb_strtolower($m[1])] = $id; // '12', '12а'
             }
         }
 

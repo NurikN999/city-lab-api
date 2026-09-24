@@ -16,14 +16,15 @@ final class KeywordIntentParser
         'transit_coverage' => ['increase', ['остановк', 'автобус']],
     ];
 
-    /** @param array<string, int> $districtIdsByNumber '12' => id */
+    /** @param array<string, int> $districtIdsByNumber '12' | '12а' => id */
     public function parse(string $prompt, array $districtIdsByNumber, int $defaultBudget): ?Intent
     {
         $text = mb_strtolower($prompt);
-        if (! preg_match('/(\d+)\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)
-            || ! isset($districtIdsByNumber[$district[1]])) {
+        if (! preg_match('/(\d+)\s*((?!й)[а-яё])?\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)
+            || ! isset($districtIdsByNumber[$district[1].($district[2] ?? '')])) {
             return null;
         }
+        $districtKey = $district[1].($district[2] ?? '');
 
         $goals = [];
         foreach (self::METRICS as $metric => [$direction, $stems]) {
@@ -44,6 +45,6 @@ final class KeywordIntentParser
             $budget = (int) round($amount * ($money[2] === 'млрд' ? 1_000_000_000 : 1_000_000));
         }
 
-        return new Intent($districtIdsByNumber[$district[1]], $goals, $budget, true);
+        return new Intent($districtIdsByNumber[$districtKey], $goals, $budget, true);
     }
 }

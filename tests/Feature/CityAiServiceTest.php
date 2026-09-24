@@ -118,4 +118,16 @@ class CityAiServiceTest extends TestCase
         $this->assertStringContainsString('Загрузка дорог −17', $text);
         $this->assertStringContainsString('52 млн ₸', $text);
     }
+
+    public function test_fallback_tells_lettered_districts_apart(): void
+    {
+        config(['services.openai.key' => null]);
+        $districts = ['12 мкр' => 105, '12А мкр' => 106];
+
+        $plain = app(CityAiService::class)->parse('Уменьши пробки в 12 мкр', $districts, self::METRICS, 100_000_000);
+        $lettered = app(CityAiService::class)->parse('Уменьши пробки в 12а мкр', $districts, self::METRICS, 100_000_000);
+
+        $this->assertSame(105, $plain->districtId);
+        $this->assertSame(106, $lettered->districtId);
+    }
 }

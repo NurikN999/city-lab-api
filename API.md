@@ -105,6 +105,18 @@ export interface BusRoute {
   district_ids: number[];    // какие районы обслуживает маршрут
 }
 
+// ===== Рисование маршрута =====
+export interface RoutePointInput { lat: number; lng: number }        // точка в пределах Актау (43.55–43.78, 51.00–51.35)
+export interface RoutePreviewRequest { points: RoutePointInput[] }   // 2..25, каждая точка = остановка
+export interface RoutePreview {
+  path: GeoLineString;      // линия по дорогам (или прямые отрезки, если snapped = false)
+  stops: LatLng[];          // точки, притянутые к ближайшей дороге
+  snapped: boolean;         // false → OSRM недоступен, линия прямая
+  district_ids: number[];   // какие районы обслуживает
+}
+export interface CreateRouteRequest extends RoutePreviewRequest { name: string } // ≤ 60 символов
+// ответ POST /routes — BusRoute (201), key вида 'u-xxxxxxxx'
+
 // ===== GET /model =====
 export interface Coupling { source: MetricKey; target: MetricKey; factor: number }
 export interface ModelResponse {
@@ -220,6 +232,8 @@ export interface BudgetExceededError extends ApiError { error: 'budget_exceeded'
 | GET | `/city` | — | — | `CityResponse` |
 | GET | `/actions` | — | — | `Action[]` |
 | GET | `/routes` | — | — | `BusRoute[]` |
+| POST | `/routes/preview` | — | 60/мин | `RoutePreview` |
+| POST | `/routes` | — | 20/мин | 201 `BusRoute` |
 | GET | `/model` | — | — | `ModelResponse` |
 | GET | `/scenarios` | — | — | `Scenario[]` (последние 50, новые первыми) |
 | POST | `/scenarios` | — | 60/мин | 201 `ScenarioWithResult` |
@@ -295,6 +309,16 @@ export interface BudgetExceededError extends ApiError { error: 'budget_exceeded'
 - Район в запросе обязателен («12 мкр», «27 микрорайон»), иначе 422 `{ "message": "Не удалось определить район. Укажите его, например: «12 мкр»." }`.
 - Если ничего не укладывается в бюджет — 200 с `scenarios: []` и пояснением в `explanation`.
 - Ответ может идти несколько секунд (OpenAI): показывайте состояние загрузки.
+
+### POST /routes/preview и POST /routes
+
+```json
+{ "name": "Маршрут · 12 мкр", "points": [{ "lat": 43.6601, "lng": 51.1601 }, { "lat": 43.6699, "lng": 51.1699 }] }
+```
+
+- `preview` (без `name`) → `RoutePreview`: линия по дорогам через OSRM; если OSRM недоступен — прямые отрезки и `snapped: false`, ответ всё равно 200.
+- `POST /routes` сохраняет маршрут → 201 `BusRoute`; его `id` сразу можно использовать в `items[].route_id` сценария с действием `new_bus_route`.
+- Точка вне Актау → 422 `errors["points.N.lat"] = ["Точка вне Актау."]`; меньше двух точек → 422 `errors.points`.
 
 ### GET /compare?ids=2,3
 

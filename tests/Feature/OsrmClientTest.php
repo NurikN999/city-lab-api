@@ -74,4 +74,15 @@ class OsrmClientTest extends TestCase
         $this->assertCount(2, $route->stops);
         $this->assertContains($twelve->id, $route->districts->pluck('id')->all());
     }
+
+    public function test_skips_osrm_for_a_minute_after_failure(): void
+    {
+        Http::fake(['router.project-osrm.org/*' => Http::response('down', 503)]);
+
+        app(OsrmClient::class)->route(self::POINTS);
+        $routed = app(OsrmClient::class)->route([[43.661, 51.161], [43.668, 51.168]]);
+
+        $this->assertFalse($routed['snapped']);
+        Http::assertSentCount(1);
+    }
 }

@@ -36,7 +36,7 @@ class AiPlanController extends Controller
             $intent->districtId,
             array_values(array_filter($actions, fn ($a) => $a->scope === 'district')),
             collect($actions)->first(fn ($a) => $a->scope === 'route'),
-            array_values($repo->routes()),
+            array_values(array_filter($repo->routes(), fn ($r) => ! str_starts_with($r->key, 'u-'))), // только подготовленные маршруты
             $intent->goals,
             $intent->budget,
         );

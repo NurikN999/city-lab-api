@@ -11,7 +11,7 @@ class RoutePointsRequest extends FormRequest
         $box = config('simulation.aktau_bbox');
 
         return [
-            'points' => ['required', 'array', 'min:2', 'max:25'],
+            'points' => ['required', 'list', 'min:2', 'max:25'],
             'points.*.lat' => ['required', 'numeric', "between:{$box['south']},{$box['north']}"],
             'points.*.lng' => ['required', 'numeric', "between:{$box['west']},{$box['east']}"],
         ];

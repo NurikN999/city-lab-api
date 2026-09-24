@@ -18,10 +18,14 @@ final class OsrmClient
     public function route(array $points): array
     {
         $coords = implode(';', array_map(fn (array $p) => $p[1].','.$p[0], $points));
+        $straight = ['path' => array_map(fn (array $p) => [$p[1], $p[0]], $points), 'stops' => $points, 'snapped' => false];
+        if (Cache::has('osrm:down')) {
+            return $straight;
+        }
 
         try {
             return Cache::remember('osrm:'.sha1($coords), 86_400, function () use ($coords) {
-                $data = Http::timeout($this->timeout)->withUserAgent('aktau-city-lab/1.0')
+                $data = Http::timeout($this->timeout)->connectTimeout(2)->withUserAgent('aktau-city-lab/1.0')
                     ->get("{$this->baseUrl}/route/v1/driving/{$coords}", ['overview' => 'full', 'geometries' => 'geojson'])
                     ->throw()->json();
                 if (($data['code'] ?? null) !== 'Ok') {
@@ -36,8 +40,9 @@ final class OsrmClient
             });
         } catch (Throwable $e) {
             report($e);
+            Cache::put('osrm:down', true, 60); // ponytail: не ждём таймаут на каждом клике, пока OSRM лежит
 
-            return ['path' => array_map(fn (array $p) => [$p[1], $p[0]], $points), 'stops' => $points, 'snapped' => false];
+            return $straight;
         }
     }
 }

@@ -79,4 +79,10 @@ class RouteDrawingApiTest extends TestCase
     {
         $this->postJson('/api/routes', ['points' => self::POINTS])->assertStatus(422)->assertJsonValidationErrors('name');
     }
+
+    public function test_points_must_be_a_list(): void
+    {
+        $this->postJson('/api/routes', ['name' => 'X', 'points' => ['a' => self::POINTS[0], 'b' => self::POINTS[1]]])
+            ->assertStatus(422)->assertJsonValidationErrors('points');
+    }
 }

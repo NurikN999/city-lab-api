@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Geodata\RouteWriter;
+use App\Models\District;
 use Database\Seeders\DemoCitySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -81,5 +83,18 @@ class AiPlanApiTest extends TestCase
         }
 
         $this->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(429);
+    }
+
+    public function test_plan_ignores_user_drawn_routes(): void
+    {
+        $d = District::where('name', '12 мкр')->firstOrFail();
+        $stops = [[$d->center_lat, $d->center_lng], [$d->center_lat + 0.001, $d->center_lng]];
+        RouteWriter::save('u-spam', 'SPAM', ['path' => [[$d->center_lng, $d->center_lat]], 'stops' => $stops, 'snapped' => true]);
+
+        $response = $this->postJson('/api/ai/plan', ['prompt' => 'Уменьши пробки в 12 мкр'])->assertOk();
+
+        foreach ($response->json('scenarios') as $s) {
+            $this->assertStringNotContainsString('SPAM', $s['scenario']['name']);
+        }
     }
 }

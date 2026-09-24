@@ -23,17 +23,29 @@ class ScenarioController extends Controller
         $items = $repo->plannedItems($request->validated('items'));
         $budget = $request->validated('budget') ?? config('simulation.default_budget');
 
-        $result = $simulation->simulate($repo->load(), $items, $budget); // BudgetExceededException → 422
-        $scenario = $repo->create($request->validated('name'), 'manual', $budget, $request->validated('district_id'), $items);
+        $city = $repo->load();
+        $result = $simulation->simulate($city, $items, $budget); // BudgetExceededException → 422
+        $districtId = $request->validated('district_id');
+        $scenario = $repo->create($request->validated('name'), 'manual', $budget, $districtId, $items);
 
-        return response()->json(['scenario' => new ScenarioResource($scenario), 'result' => $result->toArray()], 201);
+        return response()->json([
+            'scenario' => new ScenarioResource($scenario),
+            'result' => $result->toArray(),
+            'contributions' => $districtId === null ? [] : $simulation->contributions($city, $items, $districtId),
+        ], 201);
     }
 
     public function show(Scenario $scenario, CityStateRepository $repo, SimulationService $simulation): JsonResponse
     {
         $scenario->load('items.action');
-        $result = $simulation->simulate($repo->load(), $repo->itemsOf($scenario), $scenario->budget, enforceBudget: false);
+        $city = $repo->load();
+        $items = $repo->itemsOf($scenario);
+        $result = $simulation->simulate($city, $items, $scenario->budget, enforceBudget: false);
 
-        return response()->json(['scenario' => new ScenarioResource($scenario), 'result' => $result->toArray()]);
+        return response()->json([
+            'scenario' => new ScenarioResource($scenario),
+            'result' => $result->toArray(),
+            'contributions' => $scenario->district_id === null ? [] : $simulation->contributions($city, $items, $scenario->district_id),
+        ]);
     }
 }

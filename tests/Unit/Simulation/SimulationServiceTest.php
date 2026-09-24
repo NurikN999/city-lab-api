@@ -170,4 +170,29 @@ class SimulationServiceTest extends TestCase
         $this->assertSame('допущение lights', $result->assumptions['actions'][0]['assumption']);
         $this->assertSame(['source' => 'air', 'target' => 'traffic', 'factor' => -0.35], $result->assumptions['couplings'][0]);
     }
+
+    public function test_contributions_show_what_each_item_changed_in_the_district(): void
+    {
+        $lights = $this->action('lights', 10_000_000, [new EffectDef('traffic', -10)]);
+        $shade = $this->action('shade', 18_000_000, [new EffectDef('heat', -10)]);
+        $items = [new PlannedItem($lights, districtId: 1), new PlannedItem($shade, districtId: 1)];
+
+        $contributions = $this->service()->contributions($this->city(), $items, 1);
+
+        $this->assertSame(['lights', 'shade'], array_column($contributions, 'label'));
+        $this->assertEqualsWithDelta(-8.0, $contributions[0]['deltas']['traffic'], 0.001); // 80 → 72
+        $this->assertArrayNotHasKey('heat', $contributions[0]['deltas']);
+        $this->assertEqualsWithDelta(-7.0, $contributions[1]['deltas']['heat'], 0.001); // 70 → 63
+        $this->assertArrayNotHasKey('traffic', $contributions[1]['deltas']);
+    }
+
+    public function test_contributions_name_the_route_for_route_items(): void
+    {
+        $routeAction = $this->action('new_bus_route', 42_000_000, [new EffectDef('traffic', -10)], 'route');
+        $route = new RouteDef(1, 'b', 'Маршрут Б', [[43.650, 51.150]], [1]);
+
+        $contributions = $this->service()->contributions($this->city(), [new PlannedItem($routeAction, route: $route)], 1);
+
+        $this->assertSame('Маршрут Б', $contributions[0]['label']);
+    }
 }

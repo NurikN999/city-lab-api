@@ -98,4 +98,22 @@ class ScenarioApiTest extends TestCase
             ->assertJsonPath('scenario.items.0.action_key', 'smart_lights')
             ->assertJsonPath('result.over_budget', false);
     }
+
+    public function test_result_explains_each_item_contribution_in_the_district(): void
+    {
+        $response = $this->postJson('/api/scenarios', [
+            'name' => 'Светофоры + тень',
+            'district_id' => $this->twelve,
+            'items' => [
+                ['action_id' => $this->action('smart_lights'), 'district_id' => $this->twelve],
+                ['action_id' => $this->action('greening'), 'district_id' => $this->twelve],
+            ],
+        ])->assertCreated();
+
+        $this->assertSame(['Умные светофоры', 'Озеленение и теневые навесы'], array_column($response->json('contributions'), 'label'));
+        $this->assertLessThan(0, $response->json('contributions.0.deltas.traffic'));
+
+        $scenarioId = $response->json('scenario.id');
+        $this->getJson("/api/scenarios/{$scenarioId}")->assertOk()->assertJsonPath('contributions.0.label', 'Умные светофоры');
+    }
 }

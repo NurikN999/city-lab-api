@@ -44,6 +44,35 @@ final class SimulationService
         );
     }
 
+    /**
+     * Вклад каждого пункта сценария в изменения района: насколько иначе было бы без него.
+     * ponytail: leave-one-out, n+1 прогонов; вклады не обязаны складываться в итог из-за связей и убывающей отдачи.
+     *
+     * @param  list<PlannedItem>  $items
+     * @return list<array{label: string, deltas: array<string, float>}>
+     */
+    public function contributions(CityState $city, array $items, int $districtId): array
+    {
+        $full = $this->simulate($city, $items, 0, enforceBudget: false)->after['districts'][$districtId];
+        $out = [];
+        foreach ($items as $i => $item) {
+            $rest = $items;
+            unset($rest[$i]);
+            $without = $this->simulate($city, array_values($rest), 0, enforceBudget: false)->after['districts'][$districtId];
+            $deltas = [];
+            foreach ($full as $metric => $value) {
+                $delta = round($value - $without[$metric], 1);
+                if ($delta != 0.0) {
+                    $deltas[$metric] = $delta;
+                }
+            }
+            $label = $item->route?->name ?? $item->action->name;
+            $out[] = ['label' => $item->quantity > 1 ? "{$label} ×{$item->quantity}" : $label, 'deltas' => $deltas];
+        }
+
+        return $out;
+    }
+
     /** @return array<int, array<string, float>> */
     private function baseline(CityState $city): array
     {

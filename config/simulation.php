@@ -7,5 +7,6 @@ return [
     'stop_access_radius_m' => 500,
     'coverage_grid' => 12,
     'demo_density_per_ha' => 120, // ponytail: демо-допущение (жителей на гектар микрорайона), заменить данными stat.gov.kz
+    'max_user_routes' => 200, // публичный POST /routes: база не растёт бесконечно
     'aktau_bbox' => ['south' => 43.55, 'west' => 51.00, 'north' => 43.78, 'east' => 51.35],
 ];

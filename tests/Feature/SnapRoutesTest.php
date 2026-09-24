@@ -26,7 +26,7 @@ class SnapRoutesTest extends TestCase
             'waypoints' => array_fill(0, substr_count($request->url(), ';') + 1, ['location' => [51.15, 43.66]]),
         ])]);
 
-        $this->artisan('city:snap-routes b')->assertSuccessful()->expectsOutputToContain('Маршрут Б: 40 точек');
+        $this->artisan('city:snap-routes b')->assertSuccessful()->expectsOutputToContain('Маршрут Б перестроен по дорогам');
 
         $route = BusRoute::where('key', 'b')->firstOrFail();
         $this->assertCount(40, $route->path['coordinates']);

@@ -85,4 +85,14 @@ class RouteDrawingApiTest extends TestCase
         $this->postJson('/api/routes', ['name' => 'X', 'points' => ['a' => self::POINTS[0], 'b' => self::POINTS[1]]])
             ->assertStatus(422)->assertJsonValidationErrors('points');
     }
+
+    public function test_user_routes_are_capped(): void
+    {
+        $this->fakeOsrm();
+        config(['simulation.max_user_routes' => 1]);
+
+        $this->postJson('/api/routes', ['name' => 'Первый', 'points' => self::POINTS])->assertCreated();
+        $this->postJson('/api/routes', ['name' => 'Второй', 'points' => self::POINTS])
+            ->assertStatus(422)->assertJsonPath('message', 'Достигнут лимит нарисованных маршрутов.');
+    }
 }

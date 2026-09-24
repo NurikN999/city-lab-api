@@ -24,7 +24,7 @@ class SnapRoutes extends Command
                 return self::FAILURE;
             }
             RouteWriter::save($key, $route->name, $routed);
-            $this->info("{$route->name}: ".count($routed['path']).' точек по дорогам.');
+            $this->info("{$route->name} перестроен по дорогам (точек линии: ".count($routed['path']).').');
         }
 
         return self::SUCCESS;

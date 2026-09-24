@@ -36,6 +36,9 @@ class RouteController extends Controller
 
     public function store(StoreRouteRequest $request, OsrmClient $osrm): JsonResponse
     {
+        if (BusRoute::where('key', 'like', 'u-%')->count() >= config('simulation.max_user_routes')) {
+            return response()->json(['message' => 'Достигнут лимит нарисованных маршрутов.'], 422);
+        }
         $route = RouteWriter::save('u-'.Str::lower(Str::random(8)), $request->validated('name'), $osrm->route($request->points()));
 
         return response()->json($this->present($route), 201);

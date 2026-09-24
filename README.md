@@ -68,6 +68,8 @@ curl -sf -A 'city-lab-api/1.0' https://overpass-api.de/api/interpreter --data-ur
 ```
 
 4. `php artisan city:import-geodata database/data/geodata`
+5. `php artisan city:fill-demo-metrics --population` — демо-метрики и оценка населения по площади районов
+6. `php artisan city:snap-routes b c` — провести маршруты Б и В по дорогам (нужен доступ к OSRM)
 
 ## Деплой (Railway)
 
@@ -148,6 +150,8 @@ A="docker compose exec -u www-data php php artisan"
 $A migrate --force
 $A db:seed --force                                    # только один раз!
 $A city:import-geodata database/data/geodata          # реальные районы/остановки/маршруты
+$A city:fill-demo-metrics --population               # демо-метрики + население по площади
+$A city:snap-routes b c                               # маршруты Б и В по дорогам
 $A config:cache && $A route:cache
 curl -s http://127.0.0.1:8091/api/city | head -c 200  # должен вернуться JSON
 ```

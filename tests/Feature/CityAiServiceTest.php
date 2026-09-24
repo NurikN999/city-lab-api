@@ -140,4 +140,15 @@ class CityAiServiceTest extends TestCase
             $this->assertSame(106, app(CityAiService::class)->parse($prompt, $districts, self::METRICS, 100_000_000)?->districtId, $prompt);
         }
     }
+
+    public function test_openai_goal_without_district_leaves_district_open(): void
+    {
+        $this->enableOpenAi();
+        $this->fakeChat(['district_name' => 'unknown', 'goals' => [['metric' => 'heat', 'direction' => 'decrease', 'weight' => 1]], 'budget_tenge' => null]);
+
+        $intent = app(CityAiService::class)->parse('Меньше жары', self::DISTRICTS, self::METRICS, 100_000_000);
+
+        $this->assertNull($intent->districtId);
+        $this->assertSame('heat', $intent->goals[0]->metric);
+    }
 }

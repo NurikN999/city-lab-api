@@ -8,7 +8,7 @@ final readonly class Intent
 {
     /** @param list<Goal> $goals */
     public function __construct(
-        public int $districtId,
+        public ?int $districtId, // null — район не назван, выбирает движок
         public array $goals,
         public int $budget,
         public bool $fromFallback = false,

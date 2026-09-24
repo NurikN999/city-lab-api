@@ -115,7 +115,7 @@ final class CityAiService
                 $goals[] = new Goal($metric, $direction, min($weight, 1.0));
             }
         }
-        if ($districtId === null || $goals === []) {
+        if ($goals === []) {
             return null;
         }
 

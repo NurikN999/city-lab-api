@@ -178,7 +178,14 @@ export interface SimulationResult {
   over_budget: boolean;      // true, если модель подорожала после сохранения
   assumptions: Assumptions;
 }
-export interface ScenarioWithResult { scenario: Scenario; result: SimulationResult }
+// Вклад пункта сценария в район фокуса: насколько иначе было бы без него (прогон без этого пункта).
+// Вклады не обязаны складываться в итог — мешают связи метрик и убывающая отдача.
+export interface Contribution { label: string; deltas: MetricValues } // label — действие или маршрут, «×2» при повторе
+export interface ScenarioWithResult {
+  scenario: Scenario;
+  result: SimulationResult;
+  contributions?: Contribution[]; // только в POST /scenarios и GET /scenarios/{id}; [] без district_id
+}
 
 // ===== GET /compare =====
 export interface LabeledScenario extends ScenarioWithResult { label: 'A' | 'B' | 'C' }
@@ -194,6 +201,7 @@ export interface AiPlanResponse {
   intent: {
     district_id: number;
     district_name: string;
+    district_auto: boolean;   // true — район в запросе не назван, взят самый проблемный по главной цели
     goals: Goal[];
     budget: number;
     fallback: boolean;       // true → OpenAI недоступен, сработал разбор по ключевым словам

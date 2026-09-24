@@ -43,6 +43,19 @@ class KeywordIntentParserTest extends TestCase
     public function test_unknown_district_returns_null(): void
     {
         $this->assertNull((new KeywordIntentParser)->parse('Пробки в 99 мкр', self::DISTRICTS, 100_000_000));
-        $this->assertNull((new KeywordIntentParser)->parse('Пробки в городе', self::DISTRICTS, 100_000_000));
+    }
+
+    public function test_goal_without_district_leaves_district_open(): void
+    {
+        $intent = (new KeywordIntentParser)->parse('100 млн, уменьшить пробки', self::DISTRICTS, 100_000_000);
+
+        $this->assertNull($intent->districtId);
+        $this->assertSame('traffic', $intent->goals[0]->metric);
+        $this->assertSame(100_000_000, $intent->budget);
+    }
+
+    public function test_no_district_and_no_goal_is_not_understood(): void
+    {
+        $this->assertNull((new KeywordIntentParser)->parse('Привет, что умеешь?', self::DISTRICTS, 100_000_000));
     }
 }

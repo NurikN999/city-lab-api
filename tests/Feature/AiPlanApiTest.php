@@ -42,10 +42,10 @@ class AiPlanApiTest extends TestCase
         $this->assertDatabaseCount('scenarios', count($scenarios));
     }
 
-    public function test_unknown_district_is_422(): void
+    public function test_unknown_district_or_no_goal_is_422(): void
     {
-        $this->postJson('/api/ai/plan', ['prompt' => 'Уменьши пробки в городе'])
-            ->assertStatus(422)->assertJsonStructure(['message']);
+        $this->postJson('/api/ai/plan', ['prompt' => 'Уменьши пробки в 99 мкр'])->assertStatus(422)->assertJsonStructure(['message']);
+        $this->postJson('/api/ai/plan', ['prompt' => 'Привет, что умеешь?'])->assertStatus(422)->assertJsonStructure(['message']);
     }
 
     public function test_rate_limit_is_per_client_behind_proxy(): void
@@ -53,11 +53,11 @@ class AiPlanApiTest extends TestCase
         $proxy = ['REMOTE_ADDR' => '10.0.0.1'];
         for ($i = 0; $i < 10; $i++) {
             $this->withServerVariables($proxy)->withHeader('X-Forwarded-For', '1.1.1.1')
-                ->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(422);
+                ->postJson('/api/ai/plan', ['prompt' => 'Привет'])->assertStatus(422);
         }
 
         $this->withServerVariables($proxy)->withHeader('X-Forwarded-For', '2.2.2.2')
-            ->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(422);
+            ->postJson('/api/ai/plan', ['prompt' => 'Привет'])->assertStatus(422);
     }
 
     public function test_long_generated_names_fit_varchar_255(): void
@@ -79,10 +79,10 @@ class AiPlanApiTest extends TestCase
     public function test_plan_is_rate_limited(): void
     {
         for ($i = 0; $i < 10; $i++) {
-            $this->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(422);
+            $this->postJson('/api/ai/plan', ['prompt' => 'Привет'])->assertStatus(422);
         }
 
-        $this->postJson('/api/ai/plan', ['prompt' => 'пробки в городе'])->assertStatus(429);
+        $this->postJson('/api/ai/plan', ['prompt' => 'Привет'])->assertStatus(429);
     }
 
     public function test_plan_ignores_user_drawn_routes(): void
@@ -96,5 +96,17 @@ class AiPlanApiTest extends TestCase
         foreach ($response->json('scenarios') as $s) {
             $this->assertStringNotContainsString('SPAM', $s['scenario']['name']);
         }
+    }
+
+    public function test_plan_without_district_picks_the_worst_district_for_the_goal(): void
+    {
+        $worst = \App\Models\District::query()
+            ->join('district_metric_values as v', 'v.district_id', '=', 'districts.id')
+            ->join('metrics as m', 'm.id', '=', 'v.metric_id')
+            ->where('m.key', 'traffic')->orderByDesc('v.value')->value('districts.name');
+
+        $this->postJson('/api/ai/plan', ['prompt' => '100 млн, уменьшить пробки'])->assertOk()
+            ->assertJsonPath('intent.district_auto', true)
+            ->assertJsonPath('intent.district_name', $worst);
     }
 }

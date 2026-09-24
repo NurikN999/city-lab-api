@@ -20,11 +20,13 @@ final class KeywordIntentParser
     public function parse(string $prompt, array $districtIdsByNumber, int $defaultBudget): ?Intent
     {
         $text = strtr(mb_strtolower($prompt), ['a' => 'а', 'b' => 'б', 'v' => 'в']); // «12a мкр» латиницей
-        if (! preg_match('/(\d+)\s*-?\s*((?!й)[а-яё])?\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)
-            || ! isset($districtIdsByNumber[$district[1].($district[2] ?? '')])) {
-            return null;
+        $districtId = null;
+        if (preg_match('/(\d+)\s*-?\s*((?!й)[а-яё])?\s*(?:-?й\s*)?(?:мкр|микрорайон)/u', $text, $district)) {
+            $districtId = $districtIdsByNumber[$district[1].($district[2] ?? '')] ?? null;
+            if ($districtId === null) {
+                return null; // назван район, которого нет
+            }
         }
-        $districtKey = $district[1].($district[2] ?? '');
 
         $goals = [];
         foreach (self::METRICS as $metric => [$direction, $stems]) {
@@ -36,6 +38,9 @@ final class KeywordIntentParser
             }
         }
         if ($goals === []) {
+            if ($districtId === null) {
+                return null; // ни района, ни цели
+            }
             $goals[] = new Goal('traffic', 'decrease');
         }
 
@@ -45,6 +50,6 @@ final class KeywordIntentParser
             $budget = (int) round($amount * ($money[2] === 'млрд' ? 1_000_000_000 : 1_000_000));
         }
 
-        return new Intent($districtIdsByNumber[$districtKey], $goals, $budget, true);
+        return new Intent($districtId, $goals, $budget, true);
     }
 }

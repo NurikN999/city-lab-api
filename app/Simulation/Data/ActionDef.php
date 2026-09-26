@@ -14,5 +14,6 @@ final readonly class ActionDef
         public array $effects,
         public string $assumption = '',
         public ?string $sourceUrl = null,
+        public ?int $radiusM = null, // только для объектов на карте (scope = point)
     ) {}
 }

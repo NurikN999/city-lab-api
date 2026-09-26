@@ -9,5 +9,7 @@ final readonly class PlannedItem
         public ?int $districtId = null,
         public ?RouteDef $route = null,
         public int $quantity = 1,
+        public ?float $lat = null, // объект на карте
+        public ?float $lng = null,
     ) {}
 }

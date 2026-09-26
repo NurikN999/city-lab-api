@@ -3,6 +3,7 @@
 namespace Tests\Unit\Simulation;
 
 use App\Simulation\BudgetExceededException;
+use App\Simulation\Data\ActionDef;
 use App\Simulation\Data\CityState;
 use App\Simulation\Data\Coupling;
 use App\Simulation\Data\EffectDef;
@@ -194,5 +195,30 @@ class SimulationServiceTest extends TestCase
         $contributions = $this->service()->contributions($this->city(), [new PlannedItem($routeAction, route: $route)], 1);
 
         $this->assertSame('Маршрут Б', $contributions[0]['label']);
+    }
+
+    public function test_map_object_changes_each_district_by_its_covered_share(): void
+    {
+        $park = new ActionDef(90, 'park', 'Сквер', 15_000_000, 'point', [new EffectDef('heat', -8)], radiusM: 600);
+
+        $result = $this->service()->simulate($this->city(), [new PlannedItem($park, lat: 43.650, lng: 51.150)], 100_000_000);
+
+        // район 1 целиком в круге: 70 × (1 − 0.08) = 64.4
+        $this->assertEqualsWithDelta(64.4, $result->after['districts'][1]['heat'], 0.001);
+        // район 2 задет краем: эффект есть, но меньше
+        $this->assertGreaterThan(64.4, $result->after['districts'][2]['heat']);
+        $this->assertLessThan(70.0, $result->after['districts'][2]['heat']);
+        $this->assertSame(70.0, $result->after['districts'][3]['heat']);
+    }
+
+    public function test_map_object_without_effects_works_as_a_bus_stop(): void
+    {
+        $stop = new ActionDef(91, 'bus_stop', 'Остановка', 3_000_000, 'point', [], radiusM: 500);
+
+        $result = $this->service()->simulate($this->city(withCoverage: true), [new PlannedItem($stop, lat: 43.650, lng: 51.150)], 100_000_000);
+
+        $this->assertSame(0.0, $result->before['districts'][1]['transit_coverage']);
+        $this->assertGreaterThan(70.0, $result->after['districts'][1]['transit_coverage']);
+        $this->assertSame(0.0, $result->after['districts'][3]['transit_coverage']);
     }
 }

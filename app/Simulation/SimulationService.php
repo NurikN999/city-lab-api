@@ -16,6 +16,8 @@ final class SimulationService
     private array $neighborCache = [];
 
     /** @param array{diminishing_factor: float, neighbor_radius_m: float, stop_access_radius_m: float, coverage_grid: int} $config */
+    private const FAR_DISTRICT_M = 3000;
+
     public function __construct(private array $config) {}
 
     /** @param list<PlannedItem> $items */
@@ -96,6 +98,10 @@ final class SimulationService
             if ($item->route !== null) {
                 array_push($routeStops, ...$item->route->stops);
                 $routeIds[] = $item->route->id;
+            } elseif ($item->lat !== null && $item->action->effects === []) {
+                // Объект без коэффициентов (остановка) действует как маршрут — через покрытие остановками
+                $routeStops[] = [$item->lat, $item->lng];
+                $routeIds[] = "{$item->lat},{$item->lng}";
             }
         }
         if ($routeStops === [] || ! isset($city->metrics['transit_coverage'])) {
@@ -115,6 +121,11 @@ final class SimulationService
     {
         $applied = [];
         foreach ($items as $item) {
+            if ($item->lat !== null) {
+                $this->applyMapObject($city, $after, $item, $applied);
+
+                continue;
+            }
             $targets = $item->route !== null ? $item->route->districtIds : [$item->districtId];
             foreach ($targets as $districtId) {
                 if (! isset($city->districts[$districtId])) {
@@ -127,6 +138,34 @@ final class SimulationService
                     foreach ($item->action->effects as $effect) {
                         $this->applyEffect($city, $after, $districtId, $effect, $decay);
                     }
+                }
+            }
+        }
+    }
+
+    /** Объект на карте: эффект в каждом районе умножается на долю района внутри круга объекта. */
+    private function applyMapObject(CityState $city, array &$after, PlannedItem $item, array &$applied): void
+    {
+        $radius = $item->action->radiusM ?? 0;
+        if ($item->action->effects === [] || $radius <= 0) {
+            return;
+        }
+        $calculator = new CoverageCalculator($radius, $this->config['coverage_grid']);
+        foreach ($city->districts as $districtId => $district) {
+            // Далёкие районы не задеты — не считаем сетку зря
+            if (Geo::distanceM($district->lat, $district->lng, $item->lat, $item->lng) > $radius + self::FAR_DISTRICT_M) {
+                continue;
+            }
+            $share = $calculator->percent($district->ring, [[$item->lat, $item->lng]]) / 100;
+            if ($share <= 0) {
+                continue;
+            }
+            $key = $item->action->key.':'.$districtId;
+            $k = $applied[$key] = ($applied[$key] ?? 0) + 1;
+            $decay = $this->config['diminishing_factor'] ** ($k - 1);
+            foreach ($item->action->effects as $effect) {
+                if (isset($after[$districtId][$effect->metric])) {
+                    $after[$districtId][$effect->metric] *= 1 + $effect->deltaPct / 100 * $share * $decay;
                 }
             }
         }

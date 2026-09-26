@@ -88,7 +88,8 @@ export interface Action {
   name: string;
   sphere: Sphere;
   cost: number;              // ₸
-  scope: 'district' | 'route';
+  scope: 'district' | 'route' | 'point'; // point — объект конструктора на карте
+  radius_m: number | null;   // только для point: радиус влияния, м
   assumption: string;        // текст допущения для блока «Допущения модели»
   source_url: string | null;
   effects: ActionEffect[];   // у new_bus_route пусто: эффект считается через остановки
@@ -147,7 +148,8 @@ export interface ModelResponse {
 // ===== Сценарии =====
 export type ScenarioItemInput =
   | { action_id: number; district_id: number; route_id?: null; quantity?: 1 | 2 | 3 }  // scope = 'district'
-  | { action_id: number; route_id: number; district_id?: null; quantity?: 1 | 2 | 3 }; // scope = 'route'
+  | { action_id: number; route_id: number; district_id?: null; quantity?: 1 | 2 | 3 }  // scope = 'route'
+  | { action_id: number; lat: number; lng: number };                                   // scope = 'point', в пределах Актау
 
 export interface CreateScenarioRequest {
   name: string;              // ≤ 120 символов
@@ -164,6 +166,8 @@ export interface ScenarioItem {
   district_id: number | null;
   route_id: number | null;
   quantity: number;
+  lat: number | null;        // объект конструктора
+  lng: number | null;
 }
 export interface Scenario {
   id: number;
@@ -259,6 +263,7 @@ export interface BudgetExceededError extends ApiError { error: 'budget_exceeded'
 | GET | `/model` | — | — | `ModelResponse` |
 | GET | `/scenarios` | — | — | `Scenario[]` (последние 50, новые первыми) |
 | POST | `/scenarios` | — | 60/мин | 201 `ScenarioWithResult` |
+| POST | `/scenarios/preview` | — | 240/мин | `{ result: SimulationResult }` — то же тело без `name`, ничего не сохраняет |
 | GET | `/scenarios/{id}` | — | — | `ScenarioWithResult` |
 | GET | `/compare?ids=1,2,3` | — | 30/мин | `CompareResponse` |
 | POST | `/ai/plan` | — | 10/мин | `AiPlanResponse` |

@@ -116,4 +116,45 @@ class ScenarioApiTest extends TestCase
         $scenarioId = $response->json('scenario.id');
         $this->getJson("/api/scenarios/{$scenarioId}")->assertOk()->assertJsonPath('contributions.0.label', 'Умные светофоры');
     }
+
+    private function twelveCenter(): array
+    {
+        $d = District::findOrFail($this->twelve);
+
+        return ['lat' => $d->center_lat, 'lng' => $d->center_lng];
+    }
+
+    public function test_store_saves_map_objects_with_coordinates(): void
+    {
+        $response = $this->postJson('/api/scenarios', [
+            'name' => 'Конструктор: школа',
+            'district_id' => $this->twelve,
+            'items' => [['action_id' => $this->action('school')] + $this->twelveCenter()],
+        ])->assertCreated();
+
+        $this->assertEqualsWithDelta($this->twelveCenter()['lat'], $response->json('scenario.items.0.lat'), 0.000001);
+        $this->assertGreaterThan(
+            $response->json("result.before.districts.{$this->twelve}.social_access"),
+            $response->json("result.after.districts.{$this->twelve}.social_access"),
+        );
+        $this->getJson('/api/scenarios/'.$response->json('scenario.id'))->assertOk()
+            ->assertJsonPath("result.after.districts.{$this->twelve}.social_access", $response->json("result.after.districts.{$this->twelve}.social_access"));
+    }
+
+    public function test_map_object_needs_coordinates_inside_aktau(): void
+    {
+        $this->postJson('/api/scenarios', ['name' => 'X', 'items' => [['action_id' => $this->action('park')]]])
+            ->assertStatus(422)->assertJsonValidationErrors('items.0.lat');
+        $this->postJson('/api/scenarios', ['name' => 'X', 'items' => [['action_id' => $this->action('park'), 'lat' => 40.0, 'lng' => 51.16]]])
+            ->assertStatus(422)->assertJsonValidationErrors('items.0.lat');
+    }
+
+    public function test_preview_simulates_without_saving(): void
+    {
+        $this->postJson('/api/scenarios/preview', [
+            'items' => [['action_id' => $this->action('park')] + $this->twelveCenter(), ['action_id' => $this->action('bus_stop')] + $this->twelveCenter()],
+        ])->assertOk()->assertJsonStructure(['result' => ['before', 'after', 'cost', 'over_budget']]);
+
+        $this->assertDatabaseCount('scenarios', 0);
+    }
 }

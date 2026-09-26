@@ -20,6 +20,7 @@ Route::post('/routes', [RouteController::class, 'store'])->middleware('throttle:
 Route::get('/model', ModelController::class);
 Route::get('/scenarios', [ScenarioController::class, 'index']);
 Route::post('/scenarios', [ScenarioController::class, 'store'])->middleware('throttle:60,1,scenarios');
+Route::post('/scenarios/preview', [ScenarioController::class, 'preview'])->middleware('throttle:240,1,preview');
 Route::get('/scenarios/{scenario}', [ScenarioController::class, 'show']);
 Route::get('/compare', CompareController::class)->middleware('throttle:30,1,compare');
 Route::post('/ai/plan', AiPlanController::class)->middleware('throttle:10,1,ai');

@@ -26,6 +26,8 @@ class ScenarioResource extends JsonResource
                 'district_id' => $i->district_id,
                 'route_id' => $i->route_id,
                 'quantity' => $i->quantity,
+                'lat' => $i->lat,
+                'lng' => $i->lng,
             ])->all(),
             'created_at' => $this->created_at?->toIso8601String(),
         ];

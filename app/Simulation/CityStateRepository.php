@@ -64,6 +64,7 @@ final class CityStateRepository
             $a->effects->map(fn (ActionEffect $e) => new EffectDef($e->metric->key, $e->delta_pct, $e->spill))->all(),
             $a->assumption,
             $a->source_url,
+            $a->radius_m,
         )])->all();
     }
 
@@ -93,6 +94,8 @@ final class CityStateRepository
             $row['district_id'] ?? null,
             isset($row['route_id']) ? $routes[$row['route_id']] : null,
             (int) ($row['quantity'] ?? 1),
+            isset($row['lat']) ? (float) $row['lat'] : null,
+            isset($row['lng']) ? (float) $row['lng'] : null,
         ), $rows));
     }
 
@@ -100,7 +103,7 @@ final class CityStateRepository
     public function itemsOf(Scenario $scenario): array
     {
         return $this->plannedItems($scenario->items->map(
-            fn (ScenarioItem $i) => $i->only(['action_id', 'district_id', 'route_id', 'quantity'])
+            fn (ScenarioItem $i) => $i->only(['action_id', 'district_id', 'route_id', 'quantity', 'lat', 'lng'])
         )->all());
     }
 
@@ -117,6 +120,8 @@ final class CityStateRepository
                     'district_id' => $item->districtId,
                     'route_id' => $item->route?->id,
                     'quantity' => $item->quantity,
+                    'lat' => $item->lat,
+                    'lng' => $item->lng,
                 ]);
             }
 

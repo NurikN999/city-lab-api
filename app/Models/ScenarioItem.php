@@ -13,7 +13,7 @@ class ScenarioItem extends Model
 
     protected function casts(): array
     {
-        return ['quantity' => 'integer'];
+        return ['quantity' => 'integer', 'lat' => 'float', 'lng' => 'float'];
     }
 
     public function action(): BelongsTo

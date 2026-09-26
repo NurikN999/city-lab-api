@@ -10,6 +10,8 @@ class StoreScenarioRequest extends FormRequest
 {
     public function rules(): array
     {
+        $box = config('simulation.aktau_bbox');
+
         return [
             'name' => ['required', 'string', 'max:120'],
             'budget' => ['nullable', 'integer', 'min:1', 'max:10000000000'],
@@ -19,6 +21,16 @@ class StoreScenarioRequest extends FormRequest
             'items.*.district_id' => ['nullable', 'integer', 'exists:districts,id'],
             'items.*.route_id' => ['nullable', 'integer', 'exists:routes,id'],
             'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:3'],
+            'items.*.lat' => ['nullable', 'numeric', "between:{$box['south']},{$box['north']}"],
+            'items.*.lng' => ['nullable', 'numeric', "between:{$box['west']},{$box['east']}"],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'items.*.lat.between' => 'Объект вне Актау.',
+            'items.*.lng.between' => 'Объект вне Актау.',
         ];
     }
 
@@ -34,6 +46,9 @@ class StoreScenarioRequest extends FormRequest
                 }
                 if ($scope === 'route' && (empty($item['route_id']) || ! empty($item['district_id']))) {
                     $validator->errors()->add("items.$i.route_id", 'Для этого действия нужен маршрут и не нужен район.');
+                }
+                if ($scope === 'point' && (! isset($item['lat'], $item['lng']) || ! empty($item['district_id']) || ! empty($item['route_id']))) {
+                    $validator->errors()->add("items.$i.lat", 'Объект ставится на карту: нужны координаты, район и маршрут не нужны.');
                 }
             }
         }];

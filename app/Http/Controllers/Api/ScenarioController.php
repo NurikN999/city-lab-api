@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PreviewScenarioRequest;
 use App\Http\Requests\StoreScenarioRequest;
 use App\Http\Resources\ScenarioResource;
 use App\Models\Scenario;
@@ -33,6 +34,15 @@ class ScenarioController extends Controller
             'result' => $result->toArray(),
             'contributions' => $districtId === null ? [] : $simulation->contributions($city, $items, $districtId),
         ], 201);
+    }
+
+    /** Пересчёт без сохранения — конструктор зовёт его, пока объект тащат по карте. */
+    public function preview(PreviewScenarioRequest $request, CityStateRepository $repo, SimulationService $simulation): JsonResponse
+    {
+        $items = $repo->plannedItems($request->validated('items'));
+        $budget = $request->validated('budget') ?? config('simulation.default_budget');
+
+        return response()->json(['result' => $simulation->simulate($repo->load(), $items, $budget, enforceBudget: false)->toArray()]);
     }
 
     public function show(Scenario $scenario, CityStateRepository $repo, SimulationService $simulation): JsonResponse

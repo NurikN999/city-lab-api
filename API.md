@@ -117,6 +117,20 @@ export interface RoutePreview {
 export interface CreateRouteRequest extends RoutePreviewRequest { name: string } // ≤ 60 символов
 // ответ POST /routes — BusRoute (201), key вида 'u-xxxxxxxx'
 
+// ===== Жалобы жителей =====
+export type ComplaintCategory = 'transport' | 'climate' | 'water' | 'social' | 'other';
+export interface ComplaintInput { district_id: number; category: ComplaintCategory; text: string } // text 5..280
+export interface Complaint {
+  id: number;
+  district_id: number;
+  category: ComplaintCategory;
+  text: string;
+  status: 'new' | 'accepted' | 'resolved' | 'hidden';
+  created_at: string;         // ISO 8601
+}
+// GET /complaints — активные (new, accepted) за последние 24 ч, новые сверху, до 100; карта опрашивает раз в несколько секунд
+// PUT /complaints/{id} { status: 'accepted' | 'resolved' | 'hidden' } — только акимат (Bearer)
+
 // ===== GET /model =====
 export interface Coupling { source: MetricKey; target: MetricKey; factor: number }
 export interface ModelResponse {
@@ -249,6 +263,9 @@ export interface BudgetExceededError extends ApiError { error: 'budget_exceeded'
 | GET | `/compare?ids=1,2,3` | — | 30/мин | `CompareResponse` |
 | POST | `/ai/plan` | — | 10/мин | `AiPlanResponse` |
 | POST | `/login` | — | 5/мин | `LoginResponse` |
+| GET | `/complaints` | — | — | `Complaint[]` |
+| POST | `/complaints` | — | 5/мин | 201 `Complaint` |
+| PUT | `/complaints/{id}` | Bearer | — | `Complaint` |
 | PUT | `/actions/{id}` | Bearer | — | `Action` |
 | PUT | `/districts/{id}` | Bearer | — | `UpdateDistrictResponse` |
 

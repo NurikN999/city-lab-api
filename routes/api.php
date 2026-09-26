@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ActionController;
 use App\Http\Controllers\Api\AiPlanController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CompareController;
+use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\DistrictController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\ModelController;
@@ -23,8 +24,11 @@ Route::get('/scenarios/{scenario}', [ScenarioController::class, 'show']);
 Route::get('/compare', CompareController::class)->middleware('throttle:30,1,compare');
 Route::post('/ai/plan', AiPlanController::class)->middleware('throttle:10,1,ai');
 Route::post('/login', LoginController::class)->middleware('throttle:5,1,login');
+Route::get('/complaints', [ComplaintController::class, 'index']);
+Route::post('/complaints', [ComplaintController::class, 'store'])->middleware('throttle:5,1,complaints');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('/actions/{action}', [ActionController::class, 'update']);
     Route::put('/districts/{district}', DistrictController::class);
+    Route::put('/complaints/{complaint}', [ComplaintController::class, 'update']);
 });

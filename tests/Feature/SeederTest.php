@@ -23,8 +23,8 @@ class SeederTest extends TestCase
         $this->assertDatabaseCount('routes', 3);
         $this->assertDatabaseCount('route_stops', 18);
         $this->assertDatabaseCount('district_route', 16);
-        $this->assertDatabaseCount('actions', 10);
-        $this->assertDatabaseCount('action_effects', 13);
+        $this->assertDatabaseCount('actions', 15); // 10 действий + 5 объектов конструктора
+        $this->assertDatabaseCount('action_effects', 18); // + 5 эффектов объектов конструктора
         $this->assertDatabaseCount('metric_couplings', 2);
         $this->assertDatabaseHas('users', ['email' => 'akimat@citylab.kz']);
 

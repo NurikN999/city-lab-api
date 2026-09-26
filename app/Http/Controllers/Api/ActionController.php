@@ -46,6 +46,7 @@ class ActionController extends Controller
             'sphere' => ['key' => $action->sphere->key, 'name' => $action->sphere->name],
             'cost' => $action->cost,
             'scope' => $action->scope,
+            'radius_m' => $action->radius_m,
             'assumption' => $action->assumption,
             'source_url' => $action->source_url,
             'effects' => $action->effects->map(fn (ActionEffect $e) => [

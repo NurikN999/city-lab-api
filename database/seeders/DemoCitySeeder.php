@@ -11,6 +11,7 @@ use App\Models\MetricCoupling;
 use App\Models\Sphere;
 use App\Models\Stop;
 use App\Models\User;
+use App\Simulation\MapObjectCatalog;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -140,6 +141,7 @@ class DemoCitySeeder extends Seeder
 
         MetricCoupling::create(['source_metric_id' => $metrics['transit_coverage'], 'target_metric_id' => $metrics['traffic'], 'factor' => -0.35]);
         MetricCoupling::create(['source_metric_id' => $metrics['traffic'], 'target_metric_id' => $metrics['co2'], 'factor' => 0.5]);
+        MapObjectCatalog::ensure();
 
         $password = env('ADMIN_PASSWORD') ?: Str::random(16);
         User::create(['name' => 'Акимат', 'email' => 'akimat@citylab.kz', 'password' => Hash::make($password)]);

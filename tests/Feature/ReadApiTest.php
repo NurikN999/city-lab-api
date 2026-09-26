@@ -32,7 +32,7 @@ class ReadApiTest extends TestCase
 
     public function test_actions(): void
     {
-        $response = $this->getJson('/api/actions')->assertOk()->assertJsonCount(10);
+        $response = $this->getJson('/api/actions')->assertOk()->assertJsonCount(15); // 10 действий + 5 объектов конструктора
 
         $lights = collect($response->json())->firstWhere('key', 'smart_lights');
         $this->assertSame(10_000_000, $lights['cost']);

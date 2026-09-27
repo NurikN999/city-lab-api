@@ -12,6 +12,11 @@ class Complaint extends Model
 
     protected $guarded = [];
 
+    public function scenario(): BelongsTo
+    {
+        return $this->belongsTo(Scenario::class);
+    }
+
     public function sphere(): BelongsTo
     {
         return $this->belongsTo(Sphere::class);
@@ -26,6 +31,8 @@ class Complaint extends Model
             'category' => $this->sphere?->key ?? 'other',
             'text' => $this->text,
             'status' => $this->status,
+            'scenario_id' => $this->scenario_id,
+            'scenario_name' => $this->scenario?->name,
             'created_at' => $this->created_at->toIso8601String(),
         ];
     }

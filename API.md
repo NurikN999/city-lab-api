@@ -127,6 +127,8 @@ export interface Complaint {
   category: ComplaintCategory;
   text: string;
   status: 'new' | 'accepted' | 'resolved' | 'hidden';
+  scenario_id: number | null;   // сценарий, которым жалоба принята в работу
+  scenario_name: string | null;
   created_at: string;         // ISO 8601
 }
 // GET /complaints — активные (new, accepted) за последние 24 ч, новые сверху, до 100; карта опрашивает раз в несколько секунд
@@ -156,6 +158,7 @@ export interface CreateScenarioRequest {
   budget?: number;           // по умолчанию 100 000 000
   district_id?: number | null; // район фокуса (для сравнения и «до/после» района)
   items: ScenarioItemInput[];  // 1..20
+  complaint_ids?: number[];    // жалобы, которые решает сценарий: активные станут accepted
 }
 
 export interface ScenarioItem {

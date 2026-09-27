@@ -21,6 +21,8 @@ class StoreScenarioRequest extends FormRequest
             'items.*.district_id' => ['nullable', 'integer', 'exists:districts,id'],
             'items.*.route_id' => ['nullable', 'integer', 'exists:routes,id'],
             'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:3'],
+            'complaint_ids' => ['nullable', 'array', 'max:10'], // жалобы, которые решает сценарий
+            'complaint_ids.*' => ['integer', 'exists:complaints,id'],
             'items.*.lat' => ['nullable', 'numeric', "between:{$box['south']},{$box['north']}"],
             'items.*.lng' => ['nullable', 'numeric', "between:{$box['west']},{$box['east']}"],
         ];

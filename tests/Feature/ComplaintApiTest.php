@@ -98,4 +98,26 @@ class ComplaintApiTest extends TestCase
         $this->withToken($this->akimatToken())->putJson("/api/complaints/{$id}", ['status' => 'deleted'])
             ->assertStatus(422)->assertJsonValidationErrors('status');
     }
+
+    public function test_saving_a_scenario_accepts_the_complaints_it_solves(): void
+    {
+        $open = $this->complain()->json('id');
+        $closed = $this->complain(['text' => 'Уже решённая жалоба'])->json('id');
+        Complaint::whereKey($closed)->update(['status' => 'resolved']);
+        $action = \App\Models\Action::where('key', 'bus_stop')->value('id');
+        $center = District::findOrFail($this->twelve);
+
+        $scenarioId = $this->postJson('/api/scenarios', [
+            'name' => 'Конструктор: Остановка',
+            'district_id' => $this->twelve,
+            'items' => [['action_id' => $action, 'lat' => $center->center_lat, 'lng' => $center->center_lng]],
+            'complaint_ids' => [$open, $closed],
+        ])->assertCreated()->json('scenario.id');
+
+        $feed = collect($this->getJson('/api/complaints')->json())->keyBy('id');
+        $this->assertSame('accepted', $feed[$open]['status']);
+        $this->assertSame($scenarioId, $feed[$open]['scenario_id']);
+        $this->assertSame('Конструктор: Остановка', $feed[$open]['scenario_name']);
+        $this->assertSame('resolved', Complaint::find($closed)->status); // закрытую не открываем заново
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PreviewScenarioRequest;
 use App\Http\Requests\StoreScenarioRequest;
 use App\Http\Resources\ScenarioResource;
+use App\Models\Complaint;
 use App\Models\Scenario;
 use App\Simulation\CityStateRepository;
 use App\Simulation\SimulationService;
@@ -28,6 +29,10 @@ class ScenarioController extends Controller
         $result = $simulation->simulate($city, $items, $budget); // BudgetExceededException → 422
         $districtId = $request->validated('district_id');
         $scenario = $repo->create($request->validated('name'), 'manual', $budget, $districtId, $items);
+        // Жалобы, которые решает сценарий, — «приняты»; закрытые и скрытые не открываем заново
+        Complaint::whereIn('id', $request->validated('complaint_ids', []))
+            ->whereIn('status', Complaint::ACTIVE)
+            ->update(['status' => 'accepted', 'scenario_id' => $scenario->id]);
 
         return response()->json([
             'scenario' => new ScenarioResource($scenario),

@@ -19,7 +19,7 @@ class ComplaintController extends Controller
     /** Активные жалобы за сутки — карта опрашивает раз в несколько секунд. */
     public function index(): JsonResponse
     {
-        return response()->json(Complaint::with('sphere:id,key')
+        return response()->json(Complaint::with(['sphere:id,key', 'scenario:id,name'])
             ->whereIn('status', Complaint::ACTIVE)
             ->where('created_at', '>=', now()->subHours(self::FEED_HOURS))
             ->latest('id')

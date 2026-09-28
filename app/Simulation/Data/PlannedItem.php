@@ -11,5 +11,7 @@ final readonly class PlannedItem
         public int $quantity = 1,
         public ?float $lat = null, // объект на карте
         public ?float $lng = null,
+        public ?array $line = null, // расширение дороги: MultiLineString [[[lng, lat], …], …]
+        public ?int $osmId = null, // снос: id здания в OSM
     ) {}
 }

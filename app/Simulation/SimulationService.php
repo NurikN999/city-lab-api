@@ -98,7 +98,7 @@ final class SimulationService
             if ($item->route !== null) {
                 array_push($routeStops, ...$item->route->stops);
                 $routeIds[] = $item->route->id;
-            } elseif ($item->lat !== null && $item->action->effects === []) {
+            } elseif ($item->action->scope === 'point' && $item->lat !== null && $item->action->effects === []) {
                 // Объект без коэффициентов (остановка) действует как маршрут — через покрытие остановками
                 $routeStops[] = [$item->lat, $item->lng];
                 $routeIds[] = "{$item->lat},{$item->lng}";
@@ -121,7 +121,10 @@ final class SimulationService
     {
         $applied = [];
         foreach ($items as $item) {
-            if ($item->lat !== null) {
+            if ($item->action->scope === 'building') {
+                continue; // снос освобождает место, своего эффекта нет
+            }
+            if ($item->line !== null || $item->lat !== null) {
                 $this->applyMapObject($city, $after, $item, $applied);
 
                 continue;
@@ -143,7 +146,7 @@ final class SimulationService
         }
     }
 
-    /** Объект на карте: эффект в каждом районе умножается на долю района внутри круга объекта. */
+    /** Объект на карте (точка или дорога): эффект в каждом районе умножается на долю района в зоне объекта. */
     private function applyMapObject(CityState $city, array &$after, PlannedItem $item, array &$applied): void
     {
         $radius = $item->action->radiusM ?? 0;
@@ -153,10 +156,15 @@ final class SimulationService
         $calculator = new CoverageCalculator($radius, $this->config['coverage_grid']);
         foreach ($city->districts as $districtId => $district) {
             // Далёкие районы не задеты — не считаем сетку зря
-            if (Geo::distanceM($district->lat, $district->lng, $item->lat, $item->lng) > $radius + self::FAR_DISTRICT_M) {
+            $distance = $item->line !== null
+                ? Geo::distanceToLinesM($district->lat, $district->lng, $item->line)
+                : Geo::distanceM($district->lat, $district->lng, $item->lat, $item->lng);
+            if ($distance > $radius + self::FAR_DISTRICT_M) {
                 continue;
             }
-            $share = $calculator->percent($district->ring, [[$item->lat, $item->lng]]) / 100;
+            $share = ($item->line !== null
+                ? $calculator->percentNearLines($district->ring, $item->line)
+                : $calculator->percent($district->ring, [[$item->lat, $item->lng]])) / 100;
             if ($share <= 0) {
                 continue;
             }

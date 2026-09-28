@@ -29,4 +29,20 @@ final class CoverageCalculator
 
         return 100.0 * $covered / count($points);
     }
+
+    /**
+     * Доля района в коридоре вдоль линий (расширенная дорога), %.
+     *
+     * @param  list<list<array{0: float, 1: float}>>  $lines  MultiLineString [lng, lat]
+     */
+    public function percentNearLines(array $ring, array $lines): float
+    {
+        $points = Geo::grid($ring, $this->gridSize);
+        if ($points === [] || $lines === []) {
+            return 0.0;
+        }
+        $covered = count(array_filter($points, fn (array $p) => Geo::distanceToLinesM($p[0], $p[1], $lines) <= $this->radiusM));
+
+        return 100.0 * $covered / count($points);
+    }
 }

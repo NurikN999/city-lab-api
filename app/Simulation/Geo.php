@@ -50,6 +50,29 @@ final class Geo
         return abs($sum) / 2 / 10_000;
     }
 
+    /**
+     * Расстояние от точки до ближайшего отрезка ломаных, м (локальная равнопромежуточная проекция — точна в пределах города).
+     *
+     * @param  list<list<array{0: float, 1: float}>>  $lines  MultiLineString [lng, lat]
+     */
+    public static function distanceToLinesM(float $lat, float $lng, array $lines): float
+    {
+        $kx = deg2rad(1) * self::EARTH_RADIUS_M * cos(deg2rad($lat));
+        $ky = deg2rad(1) * self::EARTH_RADIUS_M;
+        $best = INF;
+        foreach ($lines as $line) {
+            for ($i = 1, $n = count($line); $i < $n; $i++) {
+                [$ax, $ay] = [($line[$i - 1][0] - $lng) * $kx, ($line[$i - 1][1] - $lat) * $ky];
+                [$bx, $by] = [($line[$i][0] - $lng) * $kx, ($line[$i][1] - $lat) * $ky];
+                $len2 = ($bx - $ax) ** 2 + ($by - $ay) ** 2;
+                $t = $len2 > 0 ? max(0.0, min(1.0, -($ax * ($bx - $ax) + $ay * ($by - $ay)) / $len2)) : 0.0;
+                $best = min($best, hypot($ax + $t * ($bx - $ax), $ay + $t * ($by - $ay)));
+            }
+        }
+
+        return $best;
+    }
+
     /** @return list<array{0: float, 1: float}> [lat, lng] cell centers of an n×n bbox grid that fall inside the ring */
     public static function grid(array $ring, int $n): array
     {

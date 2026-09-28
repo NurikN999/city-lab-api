@@ -221,4 +221,27 @@ class SimulationServiceTest extends TestCase
         $this->assertGreaterThan(70.0, $result->after['districts'][1]['transit_coverage']);
         $this->assertSame(0.0, $result->after['districts'][3]['transit_coverage']);
     }
+
+    public function test_road_widening_eases_traffic_along_the_road(): void
+    {
+        $road = new ActionDef(92, 'road_widening', 'Расширение дороги', 60_000_000, 'line', [new EffectDef('traffic', -10)], radiusM: 400);
+        $line = [[[51.145, 43.650], [51.155, 43.650]]]; // MultiLineString [lng, lat] через центр района 1
+
+        $result = $this->service()->simulate($this->city(), [new PlannedItem($road, line: $line)], 100_000_000);
+
+        $this->assertEqualsWithDelta(72.0, $result->after['districts'][1]['traffic'], 0.001); // район целиком в коридоре
+        $this->assertLessThan(60.0, $result->after['districts'][2]['traffic']); // сосед задет краем
+        $this->assertGreaterThan(54.0, $result->after['districts'][2]['traffic']);
+        $this->assertSame(80.0, $result->after['districts'][3]['traffic']);
+    }
+
+    public function test_demolition_frees_land_without_changing_metrics(): void
+    {
+        $demolish = new ActionDef(93, 'demolish', 'Снос здания', 8_000_000, 'building', []);
+
+        $result = $this->service()->simulate($this->city(withCoverage: true), [new PlannedItem($demolish, lat: 43.650, lng: 51.150, osmId: 123)], 100_000_000);
+
+        $this->assertSame($result->before['districts'], $result->after['districts']); // и не считается остановкой
+        $this->assertSame(8_000_000, $result->cost);
+    }
 }

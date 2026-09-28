@@ -25,7 +25,7 @@ class StoreScenarioRequest extends FormRequest
             'complaint_ids.*' => ['integer', 'exists:complaints,id'],
             'items.*.geometry' => ['nullable', 'array'], // расширение дороги
             'items.*.geometry.type' => ['required_with:items.*.geometry', 'in:MultiLineString'],
-            'items.*.geometry.coordinates' => ['required_with:items.*.geometry', 'array', 'min:1', 'max:50'],
+            'items.*.geometry.coordinates' => ['required_with:items.*.geometry', 'array', 'min:1', 'max:300'], // кусков улицы из тайлов; точек — до 2000
             'items.*.osm_id' => ['nullable', 'integer', 'min:1'], // снос здания
             'items.*.lat' => ['nullable', 'numeric', "between:{$box['south']},{$box['north']}"],
             'items.*.lng' => ['nullable', 'numeric', "between:{$box['west']},{$box['east']}"],

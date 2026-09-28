@@ -88,7 +88,7 @@ export interface Action {
   name: string;
   sphere: Sphere;
   cost: number;              // ₸
-  scope: 'district' | 'route' | 'point'; // point — объект конструктора на карте
+  scope: 'district' | 'route' | 'point' | 'line' | 'building'; // point — объект конструктора, line — расширение дороги, building — снос
   radius_m: number | null;   // только для point: радиус влияния, м
   assumption: string;        // текст допущения для блока «Допущения модели»
   source_url: string | null;
@@ -151,7 +151,9 @@ export interface ModelResponse {
 export type ScenarioItemInput =
   | { action_id: number; district_id: number; route_id?: null; quantity?: 1 | 2 | 3 }  // scope = 'district'
   | { action_id: number; route_id: number; district_id?: null; quantity?: 1 | 2 | 3 }  // scope = 'route'
-  | { action_id: number; lat: number; lng: number };                                   // scope = 'point', в пределах Актау
+  | { action_id: number; lat: number; lng: number }                                    // scope = 'point', в пределах Актау
+  | { action_id: number; geometry: { type: 'MultiLineString'; coordinates: [number, number][][] } } // scope = 'line': улица [lng, lat], до 2000 точек
+  | { action_id: number; osm_id: number; lat: number; lng: number };                   // scope = 'building': здание OSM (id как в тайлах OpenFreeMap)
 
 export interface CreateScenarioRequest {
   name: string;              // ≤ 120 символов
@@ -171,6 +173,8 @@ export interface ScenarioItem {
   quantity: number;
   lat: number | null;        // объект конструктора
   lng: number | null;
+  geometry: { type: 'MultiLineString'; coordinates: [number, number][][] } | null; // расширенная дорога
+  osm_id: number | null;     // снесённое здание
 }
 export interface Scenario {
   id: number;

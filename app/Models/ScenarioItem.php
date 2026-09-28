@@ -13,7 +13,7 @@ class ScenarioItem extends Model
 
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'lat' => 'float', 'lng' => 'float'];
+        return ['quantity' => 'integer', 'lat' => 'float', 'lng' => 'float', 'geometry' => 'array', 'osm_id' => 'integer'];
     }
 
     public function action(): BelongsTo

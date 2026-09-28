@@ -96,6 +96,8 @@ final class CityStateRepository
             (int) ($row['quantity'] ?? 1),
             isset($row['lat']) ? (float) $row['lat'] : null,
             isset($row['lng']) ? (float) $row['lng'] : null,
+            isset($row['geometry']['coordinates']) ? $row['geometry']['coordinates'] : null,
+            isset($row['osm_id']) ? (int) $row['osm_id'] : null,
         ), $rows));
     }
 
@@ -103,7 +105,7 @@ final class CityStateRepository
     public function itemsOf(Scenario $scenario): array
     {
         return $this->plannedItems($scenario->items->map(
-            fn (ScenarioItem $i) => $i->only(['action_id', 'district_id', 'route_id', 'quantity', 'lat', 'lng'])
+            fn (ScenarioItem $i) => $i->only(['action_id', 'district_id', 'route_id', 'quantity', 'lat', 'lng', 'geometry', 'osm_id'])
         )->all());
     }
 
@@ -122,6 +124,8 @@ final class CityStateRepository
                     'quantity' => $item->quantity,
                     'lat' => $item->lat,
                     'lng' => $item->lng,
+                    'geometry' => $item->line !== null ? ['type' => 'MultiLineString', 'coordinates' => $item->line] : null,
+                    'osm_id' => $item->osmId,
                 ]);
             }
 

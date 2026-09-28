@@ -23,6 +23,10 @@ class StoreScenarioRequest extends FormRequest
             'items.*.quantity' => ['nullable', 'integer', 'min:1', 'max:3'],
             'complaint_ids' => ['nullable', 'array', 'max:10'], // жалобы, которые решает сценарий
             'complaint_ids.*' => ['integer', 'exists:complaints,id'],
+            'items.*.geometry' => ['nullable', 'array'], // расширение дороги
+            'items.*.geometry.type' => ['required_with:items.*.geometry', 'in:MultiLineString'],
+            'items.*.geometry.coordinates' => ['required_with:items.*.geometry', 'array', 'min:1', 'max:50'],
+            'items.*.osm_id' => ['nullable', 'integer', 'min:1'], // снос здания
             'items.*.lat' => ['nullable', 'numeric', "between:{$box['south']},{$box['north']}"],
             'items.*.lng' => ['nullable', 'numeric', "between:{$box['west']},{$box['east']}"],
         ];
@@ -52,7 +56,37 @@ class StoreScenarioRequest extends FormRequest
                 if ($scope === 'point' && (! isset($item['lat'], $item['lng']) || ! empty($item['district_id']) || ! empty($item['route_id']))) {
                     $validator->errors()->add("items.$i.lat", 'Объект ставится на карту: нужны координаты, район и маршрут не нужны.');
                 }
+                if ($scope === 'line' && ! $this->lineInsideAktau($item['geometry']['coordinates'] ?? null)) {
+                    $validator->errors()->add("items.$i.geometry", 'Нужна линия улицы в пределах Актау (до 2000 точек).');
+                }
+                if ($scope === 'building' && (empty($item['osm_id']) || ! isset($item['lat'], $item['lng']))) {
+                    $validator->errors()->add("items.$i.osm_id", 'Для сноса нужны здание (osm_id) и его координаты.');
+                }
             }
         }];
+    }
+
+    /** MultiLineString [[[lng, lat], …], …]: каждая линия от 2 точек, всего до 2000, все внутри Актау. */
+    private function lineInsideAktau(mixed $lines): bool
+    {
+        if (! is_array($lines) || $lines === []) {
+            return false;
+        }
+        $box = config('simulation.aktau_bbox');
+        $points = 0;
+        foreach ($lines as $line) {
+            if (! is_array($line) || count($line) < 2) {
+                return false;
+            }
+            foreach ($line as $p) {
+                if (! is_array($p) || count($p) !== 2 || ! is_numeric($p[0]) || ! is_numeric($p[1])
+                    || $p[0] < $box['west'] || $p[0] > $box['east'] || $p[1] < $box['south'] || $p[1] > $box['north']) {
+                    return false;
+                }
+                $points++;
+            }
+        }
+
+        return $points <= 2000;
     }
 }

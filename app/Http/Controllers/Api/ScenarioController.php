@@ -9,6 +9,7 @@ use App\Http\Resources\ScenarioResource;
 use App\Models\Complaint;
 use App\Models\Scenario;
 use App\Simulation\CityStateRepository;
+use App\Simulation\Data\CityState;
 use App\Simulation\SimulationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -37,7 +38,7 @@ class ScenarioController extends Controller
         return response()->json([
             'scenario' => new ScenarioResource($scenario),
             'result' => $result->toArray(),
-            'contributions' => $districtId === null ? [] : $simulation->contributions($city, $items, $districtId),
+            'contributions' => $this->contributions($simulation, $city, $items, $districtId),
         ], 201);
     }
 
@@ -60,7 +61,17 @@ class ScenarioController extends Controller
         return response()->json([
             'scenario' => new ScenarioResource($scenario),
             'result' => $result->toArray(),
-            'contributions' => $scenario->district_id === null ? [] : $simulation->contributions($city, $items, $scenario->district_id),
+            'contributions' => $this->contributions($simulation, $city, $items, $scenario->district_id),
         ]);
+    }
+
+    /** Пустые deltas (снос без эффекта) отдаём объектом {}: json_encode превратил бы [] в список. */
+    private function contributions(SimulationService $simulation, CityState $city, array $items, ?int $districtId): array
+    {
+        if ($districtId === null) {
+            return [];
+        }
+
+        return array_map(fn (array $c) => [...$c, 'deltas' => (object) $c['deltas']], $simulation->contributions($city, $items, $districtId));
     }
 }

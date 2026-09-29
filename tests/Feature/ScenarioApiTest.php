@@ -180,6 +180,18 @@ class ScenarioApiTest extends TestCase
         );
     }
 
+    public function test_item_without_effect_has_empty_deltas_object(): void
+    {
+        $response = $this->postJson('/api/scenarios', [
+            'name' => 'Только снос',
+            'district_id' => $this->twelve,
+            'items' => [['action_id' => $this->action('demolish'), 'osm_id' => 3275346630] + $this->twelveCenter()],
+        ])->assertCreated();
+
+        $this->assertStringContainsString('"deltas":{}', $response->getContent()); // фронт ждёт объект, не []
+        $this->assertStringContainsString('"deltas":{}', $this->getJson('/api/scenarios/'.$response->json('scenario.id'))->getContent());
+    }
+
     public function test_road_and_demolition_need_their_geometry(): void
     {
         $far = ['type' => 'MultiLineString', 'coordinates' => [[[45.0, 40.0], [45.1, 40.0]]]];

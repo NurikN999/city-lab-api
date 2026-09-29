@@ -157,4 +157,38 @@ class ScenarioApiTest extends TestCase
 
         $this->assertDatabaseCount('scenarios', 0);
     }
+
+    public function test_store_saves_road_widening_and_demolition(): void
+    {
+        $c = $this->twelveCenter();
+        $line = ['type' => 'MultiLineString', 'coordinates' => [[[$c['lng'] - 0.004, $c['lat']], [$c['lng'] + 0.004, $c['lat']]]]];
+
+        $response = $this->postJson('/api/scenarios', [
+            'name' => 'Перепланировка',
+            'district_id' => $this->twelve,
+            'items' => [
+                ['action_id' => $this->action('road_widening'), 'geometry' => $line],
+                ['action_id' => $this->action('demolish'), 'osm_id' => 3275346630] + $c,
+            ],
+        ])->assertCreated();
+
+        $this->assertSame($line, $response->json('scenario.items.0.geometry'));
+        $this->assertSame(3275346630, $response->json('scenario.items.1.osm_id'));
+        $this->assertLessThan(
+            $response->json("result.before.districts.{$this->twelve}.traffic"),
+            $response->json("result.after.districts.{$this->twelve}.traffic"),
+        );
+    }
+
+    public function test_road_and_demolition_need_their_geometry(): void
+    {
+        $far = ['type' => 'MultiLineString', 'coordinates' => [[[45.0, 40.0], [45.1, 40.0]]]];
+
+        $this->postJson('/api/scenarios', ['name' => 'X', 'items' => [['action_id' => $this->action('road_widening')]]])
+            ->assertStatus(422)->assertJsonValidationErrors('items.0.geometry');
+        $this->postJson('/api/scenarios', ['name' => 'X', 'items' => [['action_id' => $this->action('road_widening'), 'geometry' => $far]]])
+            ->assertStatus(422)->assertJsonValidationErrors('items.0.geometry');
+        $this->postJson('/api/scenarios', ['name' => 'X', 'items' => [['action_id' => $this->action('demolish')] + $this->twelveCenter()]])
+            ->assertStatus(422)->assertJsonValidationErrors('items.0.osm_id');
+    }
 }
